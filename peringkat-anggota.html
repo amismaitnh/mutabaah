@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peringkat Anggota - Markaz Islami</title>
+    <style>
+        :root {
+            --primary: #736b23;
+            --secondary: #9ade24;
+            --accent: #f5de3e;
+            --light: #ecf0f1;
+            --dark: #0d0a06;
+            --text: #333;
+            --text-light: #777;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+        header { background-color: white; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
+        .logo-icon { width: 40px; height: 40px; background-color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--primary); font-weight: bold; }
+        .menu-btn { display: flex; flex-direction: column; cursor: pointer; gap: 6px; }
+        .menu-btn span { width: 30px; height: 4px; background-color: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -8px); }
+        .dropdown { position: absolute; top: 100%; right: 5%; background-color: white; min-width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
+        .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown a { display: block; padding: 14px 20px; color: var(--text); text-decoration: none; font-size: 1.1rem; transition: background 0.3s ease; }
+        .dropdown a:hover { background-color: var(--light); }
+        main { margin-top: 80px; padding: 2rem 5%; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: var(--primary); text-align: center; margin: 2rem 0; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin: 2rem 0; }
+        th { background: var(--primary); color: white; padding: 1.5rem; text-align: left; }
+        td { padding: 1.5rem; border-bottom: 1px solid var(--text-light); }
+        tr:hover { background: var(--light); }
+        .no-data { text-align: center; padding: 3rem; color: var(--text-light); font-style: italic; }
+        .reset-btn { display: block; margin: 3rem auto; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; }
+        .filter-container { 
+            background: white; 
+            padding: 1.5rem; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            margin: 2rem auto 1.5rem; 
+            max-width: 700px;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-end;
+        }
+        .filter-row:last-child {
+            margin-bottom: 0;
+            justify-content: center;
+            padding-top: 0.5rem;
+        }
+        .filter-group { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-label { 
+            font-weight: bold; 
+            color: var(--primary); 
+            margin-bottom: 0.5rem; 
+            font-size: 0.9rem;
+        }
+        .filter-select, .filter-input { 
+            padding: 0.8rem; 
+            border: 1px solid var(--text-light); 
+            border-radius: 8px; 
+            font-size: 1rem; 
+        }
+        .filter-btn { 
+            background: var(--secondary); 
+            color: var(--dark); 
+            padding: 0.8rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-btn:hover { background: var(--accent); }
+        .filter-reset { 
+            background: #95a5a6; 
+            color: white; 
+            padding: 0.8rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-reset:hover { background: #7f8c8d; }
+        .filter-info { 
+            text-align: center; 
+            color: var(--primary); 
+            font-weight: bold; 
+            margin: 1rem 0; 
+            font-size: 1.1rem;
+        }
+        .avg-points { 
+            font-size: 1.2rem; 
+            text-align: center; 
+            margin: 1rem 0 2rem; 
+            color: var(--text);
+        }
+        .avg-points span { 
+            font-weight: bold; 
+            color: var(--primary); 
+            background: var(--light);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+        @media (max-width: 768px) {
+            th, td { padding: 1rem; font-size: 0.9rem; }
+            .filter-row { flex-direction: column; }
+            .filter-group { width: 100%; min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">MI</div>
+            <div>Mutabaah Aktivis<br><span style="font-size: 0.9rem; opacity: 0.9;">Markaz Islami</span></div>
+        </div>
+        <div class="menu-btn" id="menuBtn">
+            <span></span><span></span><span></span>
+        </div>
+        <nav class="dropdown" id="dropdown">
+            <a href="index.html">Beranda</a>
+            <a href="isi-mutabaah.html">Isi Mutabaah</a>
+            <a href="progress-divisi.html">Progress Divisi</a>
+            <a href="peringkat-divisi.html">Peringkat Divisi</a> <!-- TAMBAHKAN INI -->
+            <a href="peringkat-anggota.html">Peringkat Anggota</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Peringkat Anggota</h1>
+
+            <!-- Filter Section -->
+            <div class="filter-container">
+                <!-- Baris 1: Divisi -->
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Divisi</div>
+                        <select id="filterDivisi" class="filter-select">
+                            <option value="">Semua Divisi</option>
+                            <option>PHT</option>
+                            <option>staff inti</option>
+                            <option>PSDM</option>
+                            <option>SYIDAK</option>
+                            <option>DKMA</option>
+                            <option>JWR</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Baris 2: Gender dan Kelas -->
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Gender</div>
+                        <select id="filterGender" class="filter-select">
+                            <option value="">Semua Gender</option>
+                            <option value="Ikhwan">Ikhwan</option>
+                            <option value="Akhwat">Akhwat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Kelas</div>
+                        <select id="filterKelas" class="filter-select">
+                            <option value="">Semua Kelas</option>
+                            <option value="X">X</option>
+                            <option value="XI">XI</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Baris 3: Bulan dan Tahun -->
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Bulan</div>
+                        <select id="filterBulan" class="filter-select">
+                            <option value="">Semua Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Tahun</div>
+                        <select id="filterTahun" class="filter-select">
+                            <option value="">Semua Tahun</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Baris 4: Button -->
+                <div class="filter-row">
+                    <button class="filter-btn" onclick="applyFilters()">Terapkan Filter</button>
+                    <button class="filter-reset" onclick="resetFilters()">Reset Filter</button>
+                </div>
+            </div>
+
+            <!-- Info Filter Aktif -->
+            <div id="filterInfo" class="filter-info"></div>
+
+            <!-- Rata-rata Poin -->
+            <div id="avgPointsInfo" class="avg-points"></div>
+
+            <!-- Ranking Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Nama Anggota</th>
+                        <th>Gender</th>
+                        <th>Kelas</th>
+                        <th>Divisi</th>
+                        <th>Total Poin</th>
+                        <th>Entri</th>
+                        <th>Rata-rata</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingBody">
+                    <tr><td colspan="8" class="no-data">Belum ada data mutabaah. Isi mutabaah terlebih dahulu.</td></tr>
+                </tbody>
+            </table>
+
+            <!-- <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data (Testing)</button> -->
+        </div>
+    </main>
+
+    <script>
+        // Menu script
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('dropdown');
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            dropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                menuBtn.classList.remove('active');
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Filter data
+        let currentFilters = {
+            divisi: '',
+            gender: '',
+            kelas: '',
+            bulan: '',
+            tahun: ''
+        };
+
+        function getFilteredData() {
+            const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+            
+            if (!currentFilters.divisi && !currentFilters.gender && !currentFilters.kelas && !currentFilters.bulan && !currentFilters.tahun) {
+                return data;
+            }
+            
+            return data.filter(entry => {
+                if (currentFilters.divisi && entry.divisi !== currentFilters.divisi) return false;
+                if (currentFilters.gender && entry.gender !== currentFilters.gender) return false;
+                if (currentFilters.kelas && entry.kelas !== currentFilters.kelas) return false;
+                if (currentFilters.bulan && entry.bulan !== currentFilters.bulan) return false;
+                if (currentFilters.tahun && entry.tahun !== currentFilters.tahun) return false;
+                return true;
+            });
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                divisi: document.getElementById('filterDivisi').value,
+                gender: document.getElementById('filterGender').value,
+                kelas: document.getElementById('filterKelas').value,
+                bulan: document.getElementById('filterBulan').value,
+                tahun: document.getElementById('filterTahun').value
+            };
+            
+            updateFilterInfo();
+            renderRanking();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterDivisi').value = '';
+            document.getElementById('filterGender').value = '';
+            document.getElementById('filterKelas').value = '';
+            document.getElementById('filterBulan').value = '';
+            document.getElementById('filterTahun').value = '';
+            
+            currentFilters = {
+                divisi: '',
+                gender: '',
+                kelas: '',
+                bulan: '',
+                tahun: ''
+            };
+            
+            updateFilterInfo();
+            renderRanking();
+        }
+
+        function updateFilterInfo() {
+            const infoDiv = document.getElementById('filterInfo');
+            const filters = [];
+            
+            const monthNames = {
+                '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+                '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+                '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+            };
+            
+            if (currentFilters.divisi) filters.push(`Divisi: ${currentFilters.divisi}`);
+            if (currentFilters.gender) filters.push(`Gender: ${currentFilters.gender}`);
+            if (currentFilters.kelas) filters.push(`Kelas: ${currentFilters.kelas}`);
+            if (currentFilters.bulan) filters.push(`Bulan: ${monthNames[currentFilters.bulan]}`);
+            if (currentFilters.tahun) filters.push(`Tahun: ${currentFilters.tahun}`);
+            
+            if (filters.length > 0) {
+                infoDiv.textContent = `Filter Aktif: ${filters.join(' | ')}`;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.textContent = 'Menampilkan semua data';
+                infoDiv.style.display = 'block';
+            }
+        }
+
+        function renderRanking() {
+            const filteredData = getFilteredData();
+            
+            // Hitung statistik per anggota
+            const memberStats = {};
+            filteredData.forEach(entry => {
+                if (!memberStats[entry.nama]) {
+                    memberStats[entry.nama] = { 
+                        total: 0, 
+                        divisi: entry.divisi, 
+                        gender: entry.gender,
+                        kelas: entry.kelas,
+                        entries: 0 
+                    };
+                }
+                memberStats[entry.nama].total += entry.points;
+                memberStats[entry.nama].entries += 1;
+            });
+            
+            // Konversi ke array dan sort
+            const ranked = Object.keys(memberStats).map(nama => ({
+                nama,
+                divisi: memberStats[nama].divisi,
+                gender: memberStats[nama].gender,
+                kelas: memberStats[nama].kelas,
+                total: memberStats[nama].total,
+                entries: memberStats[nama].entries,
+                avg: memberStats[nama].entries > 0 ? Math.round(memberStats[nama].total / memberStats[nama].entries) : 0
+            }));
+            
+            ranked.sort((a, b) => b.total - a.total);
+            
+            // Update rata-rata poin
+            const totalPoints = ranked.reduce((sum, member) => sum + member.total, 0);
+            const totalEntries = ranked.reduce((sum, member) => sum + member.entries, 0);
+            const avgPoints = totalEntries > 0 ? Math.round(totalPoints / totalEntries) : 0;
+            
+            document.getElementById('avgPointsInfo').innerHTML = `
+                Rata-rata poin per entri: <span>${avgPoints} poin</span> | 
+                Total anggota: <span>${ranked.length} orang</span> | 
+                Total entri: <span>${totalEntries} data</span>
+            `;
+            
+            // Update tabel
+            const tbody = document.getElementById('rankingBody');
+            tbody.innerHTML = '';
+            
+            if (ranked.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="no-data">Tidak ada data untuk filter yang dipilih.</td></tr>';
+            } else {
+                ranked.forEach((member, index) => {
+                    const tr = document.createElement('tr');
+                    
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${member.nama}</td>
+                        <td>${member.gender || '-'}</td>
+                        <td>${member.kelas || '-'}</td>
+                        <td>${member.divisi}</td>
+                        <td><strong>${member.total}</strong></td>
+                        <td>${member.entries}</td>
+                        <td>${member.avg} poin</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        // Initialize
+        updateFilterInfo();
+        renderRanking();
+    </script>
+</body>
+</html>

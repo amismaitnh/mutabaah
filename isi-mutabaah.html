@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isi Mutabaah - Markaz Islami</title>
+    <style>
+        :root {
+            --primary: #736b23;
+            --secondary: #9ade24;
+            --accent: #f5de3e;
+            --light: #ecf0f1;
+            --dark: #0d0a06;
+            --text: #333;
+            --text-light: #777;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+        header { background-color: white; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
+        .logo-icon { width: 40px; height: 40px; background-color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--primary); font-weight: bold; }
+        .menu-btn { display: flex; flex-direction: column; cursor: pointer; gap: 6px; }
+        .menu-btn span { width: 30px; height: 4px; background-color: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -8px); }
+        .dropdown { position: absolute; top: 100%; right: 5%; background-color: white; min-width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
+        .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown a { display: block; padding: 14px 20px; color: var(--text); text-decoration: none; font-size: 1.1rem; transition: background 0.3s ease; }
+        .dropdown a:hover { background-color: var(--light); }
+        main { margin-top: 80px; padding: 2rem 5%; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        h1 { color: var(--primary); text-align: center; margin: 2rem 0; }
+        form { max-width: 700px; margin: 0 auto; background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--primary); }
+        .form-group small { display: block; color: var(--text-light); font-weight: normal; font-size: 0.9rem; margin-top: 0.3rem; }
+        .form-group input, .form-group select { width: 100%; padding: 1rem; border: 1px solid var(--text-light); border-radius: 8px; font-size: 1rem; }
+        .submit-btn { background: var(--secondary); color: var(--dark); padding: 1rem 2rem; border: none; border-radius: 50px; font-size: 1.1rem; cursor: pointer; width: 100%; margin-top: 2rem; transition: 0.3s; }
+        .submit-btn:hover { background: var(--accent); }
+        .reset-btn { display: block; margin: 3rem auto 0; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; }
+        .note { text-align: center; color: var(--text-light); margin: 2rem 0; font-style: italic; font-size: 1rem; }
+        .form-row { display: flex; gap: 1rem; }
+        .form-row .form-group { flex: 1; }
+        .warning-message {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .warning-message.show {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .form-row { flex-direction: column; gap: 0; }
+            .form-group { margin-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">MI</div>
+            <div>Mutabaah Aktivis<br><span style="font-size: 0.9rem; opacity: 0.9;">Markaz Islami</span></div>
+        </div>
+        <div class="menu-btn" id="menuBtn">
+            <span></span><span></span><span></span>
+        </div>
+        <nav class="dropdown" id="dropdown">
+            <a href="index.html">Beranda</a>
+            <a href="isi-mutabaah.html">Isi Mutabaah</a>
+            <a href="progress-divisi.html">Progress Divisi</a>
+            <a href="peringkat-divisi.html">Peringkat Divisi</a> <!-- TAMBAHKAN INI -->
+            <a href="peringkat-anggota.html">Peringkat Anggota</a>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Isi Mutabaah Harian</h1>
+        
+            <!-- Warning Message -->
+            <div id="warningMessage" class="warning-message"></div>
+
+            <form id="mutabaahForm">
+                <!-- Informasi Anggota -->
+                <div class="form-group">
+                    <label>Nama Anggota</label>
+                    <input type="text" list="namaList" id="nama" required placeholder="Ketik atau pilih nama">
+                    <datalist id="namaList">
+                        <option value="Ahsanurrizqi">
+                        <option value="Azmina Tsania Mafaza">
+                        <option value="Alimul Haq Al Fatih">
+                        <option value="Alifah Hasna Setyawan">
+                        <option value="Aqila Hanin Najiyya">
+                        <option value="Farid Abrar Ramadhan">
+                        <option value="Zalfan Almundzir">
+                        <option value="Athiya Khaerunnisa">
+                        <option value="Alma Ryzqya Ramadhani">
+                        <option value="Fauzan Rijalul Jaddid">
+                        <option value="Hasna Rifaya Nafiah">
+                        <option value="Ahmad Ali Nafis Mujahir">
+                        <option value="Muhammad Faisal Iqbal">
+                        <option value="Najwa Nur Azizah">
+                        <option value="Aulia Devina Omantin">
+                        <option value="Fathir Hanifan Romadloni">
+                        <option value="Tsabita Al Firdaus">
+                        <option value="Syafiq Aufa Asykari">
+                        <option value="Yasqi Azka Argani">
+                        <option value="Ahmad Althaf Rizqillah">
+                        <option value="Naufal Ariq Saputra">
+                        <option value="Fachryza Zuhair Nabil Arrazaq">
+                        <option value="Fadhil Abdillah Ramadhan">
+                        <option value="Muhammad Fathrizkzein Zidane">
+                        <option value="Muhammad Muzdahir Syafiq">
+                        <option value="Aqila Adzkia">
+                        <option value="Aufa Nissa' Al Majidah">
+                        <option value="Faizah Mufidatun Azizah">
+                        <option value="Fanny Afnan Jannati">
+                        <option value="Zharifah Himmah Al Alyyah">
+                        <option value="Farah Asysan Syifa">
+                        <option value="Najwa Aqilla Janitra">
+                        <option value="Qanita Sharah Hafizhah">
+                        <option value="Zainab Asshabira">
+                        <option value="Afra Mufidah Riyadi">
+                        <option value="Nabila Tsabita Rahmania">
+                        <option value="Yusuf Azzam Hafi">
+                        <option value="Annisa Zulfa Salsabila">
+                        <option value="Fadly Maulana An-Nafi">
+                        <option value="Nidzar Hammam Ismath">
+                        <option value="Hidayat Nur Aziz">
+                        <option value="Muhammad Imanulhaq">
+                        <option value="Muhammad Tsaqib Hilmi A.">
+                        <option value="Naufal Ghoniyun Karim">
+                        <option value="Reyza Emirsyah Hidayat">
+                        <option value="Tsabit Abdussalam Akif N. S.">
+                        <option value="Azalia Rahma Nirmala Dewi">
+                        <option value="Najla Khairunnisa">
+                        <option value="Khansa Putri Risdianto">
+                        <option value="Arkani Kayla Khairunnisa">
+                        <option value="Ayesha Ahnaf Hammasyah">
+                        <option value="Khonza Adzkia">
+                        <option value="Chandrika Kania Damara">
+                        <option value="Aisya Nadira">
+                        <option value="Hasna Dzakia Salma K.">
+                        <option value="Kainuna Regita Khairunnisa">
+                        <option value="Zahratul Khoiriyyah">
+                        <option value="Sholiha Bilqis Trikurnia">
+                        <option value="Umar Fakhruddin Khairullah">
+                        <option value="Aisyah Mar'atus Sholikah">
+                        <option value="Maulana Ibnu Faiq">
+                        <option value="Zaky Zydan Ramtizi">
+                        <option value="Azzam Nur Tsabita Arif">
+                        <option value="Zufar Abdillah Tsaqif">
+                        <option value="Rais Hikari">
+                        <option value="Miftahuddin Ghoffar As Sidiq">
+                        <option value="Affan Rasyid Ilman">
+                        <option value="Rizqi Akhtar Putra Sunanda">
+                        <option value="Aderisti Maurelia Putri">
+                        <option value="Aliya Nuha Humaira Mushoffa">
+                        <option value="Nada Zaafarani Assyifa">
+                        <option value="Syarifah Nugraheningsih">
+                        <option value="Salwaa Alyaa' Prameshwari">
+                        <option value="Rofi Munajati">
+                        <option value="Keyla Nurkhasna Qoni'ah">
+                        <option value="Athaya Yasmin Althafunnisa">
+                        <option value="Khansa">
+                        <option value="Zalyani Niswatun Nafi'ah">
+                        <option value="Ikhtia Hauraya Annizar">
+                        <option value="Nisa'ul Akmaal G. M. N. L.">
+                        <option value="Hilya Nada Aufia">
+                        <option value="Syauqi Firdaus Fiiridhotillah">
+                        <option value="Alyaa Widya Arza Sentosa">
+                        <option value="Rafif Syauqi Nashrullah">
+                        <option value="Hanan Ahmad Mukhayyar">
+                        <option value="Zaidan Rais Altair">
+                        <option value="Rizqullah Jihada Muhsin">
+                        <option value="Andrew Shea">
+                        <option value="Ayyash Dhiyaulhaq Cunggin">
+                        <option value="Gaozhan Wiby Al-Karimi">
+                        <option value="Ba'ayu Febria Ristika">
+                        <option value="Fatimah Naura Ulya">
+                        <option value="Haura Nada Tsabita">
+                        <option value="Nafisa Azka Armandriani">
+                        <option value="Rona Karima">
+                        <option value="Annisa Rahma Aji">
+                        <option value="Alya Dini Khoirunnisa">
+                        <option value="Hayan Hadi Gunjaya">
+                        <option value="Ibrahim Banu Atiro">
+                        <option value="Lathifah Lubna Azizah">
+                        <option value="Runaisha Afra Shofia A.">
+                        <option value="Luthfia Inafi Muthi'ah">
+                        <option value="Veisya Saffaina Sasongko">
+                    </datalist>
+                </div>
+
+                <!-- Baris untuk Gender dan Kelas -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="gender" required>
+                            <option value="">Pilih Gender</option>
+                            <option value="Ikhwan">Ikhwan</option>
+                            <option value="Akhwat">Akhwat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <select id="kelas" required>
+                            <option value="">Pilih Kelas</option>
+                            <option value="X">X</option>
+                            <option value="XI">XI</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Baris untuk Jenis Pengurus dan Divisi dalam satu baris -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Jenis Pengurus</label>
+                        <select id="jenisPengurus" required>
+                            <option value="">Pilih Jenis Pengurus</option>
+                            <option value="Pengurus Harian Tetap">Pengurus Harian Tetap</option>
+                            <option value="Pengurus Harian Lengkap">Pengurus Harian Lengkap</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Divisi</label>
+                        <select id="divisi" required>
+                            <option value="">Pilih Divisi</option>
+                            <option>PHT</option>
+                            <option>staff inti</option>
+                            <option>PSDM</option>
+                            <option>SYIDAK</option>
+                            <option>DKMA</option>
+                            <option>JWR</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Baris untuk Bulan dan Tahun -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Bulan</label>
+                        <select id="bulan" required onchange="checkExistingEntry()">
+                            <option value="">Pilih Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tahun</label>
+                        <input type="number" id="tahun" min="2025" value="2025" required placeholder="Tahun" onchange="checkExistingEntry()">
+                    </div>
+                </div>
+
+                <!-- Ibadah Harian -->
+                <h2 style="text-align:left; margin: 3rem 0 2rem; color: var(--primary);">Ibadah Harian</h2>
+                
+                <div class="form-group">
+                    <label>Salat Berjamaah dan/atau Tepat Waktu 
+                        <small>Target: 25–35 kali/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="salatBerjamaah" placeholder="Jumlah waktu salat wajib (0-5)" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Salat Sunah Rawatib 
+                        <small>Target: 21–35 kali/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="salatRawatib" placeholder="Jumlah pelaksanaan" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Salat Dhuha 
+                        <small>Target: 5–7 kali/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="salatDhuha" placeholder="Jumlah kali dilakukan" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Salat Tahajjud 
+                        <small>Target: 5–7 kali/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="salatTahajjud" placeholder="Jumlah kali dilakukan" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Tilawah Al-Qur'an 
+                        <small>Min. 40 halaman/pekan (2 juz)</small>
+                    </label>
+                    <input type="number" min="0" id="tilawah" placeholder="Jumlah halaman" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Murajaah 
+                        <small>Min. 20 halaman/pekan (1 juz)</small>
+                    </label>
+                    <input type="number" min="0" id="murajaah" placeholder="Jumlah halaman" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Infak 
+                        <small>Min. 1 kali/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="infak" placeholder="Jumlah kali dilakukan" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Silaturahmi 
+                        <small>Min. 1 kali/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="silaturahmi" placeholder="Jumlah kali/orang" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Puasa Sunah 
+                        <small>Min. 2 kali/bulan</small>
+                    </label>
+                    <input type="number" min="0" id="puasaSunnah" placeholder="0 = tidak, 1 = ya" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Membaca Buku 
+                        <small>Min. 20 halaman/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="membacaBuku" placeholder="Jumlah halaman" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Olahraga 
+                        <small>Min. 150 menit/pekan</small>
+                    </label>
+                    <input type="number" min="0" id="olahraga" placeholder="Jumlah menit" value="0">
+                </div>
+
+                <button type="submit" class="submit-btn">Kirim Mutabaah</button>
+            </form>
+            <!-- <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data (Testing)</button> -->
+        </div>
+    </main>
+    <script>
+        // Menu script
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('dropdown');
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            dropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                menuBtn.classList.remove('active');
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Set default bulan ke bulan saat ini
+        const now = new Date();
+        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+        const currentYear = now.getFullYear();
+        document.getElementById('bulan').value = currentMonth;
+        document.getElementById('tahun').value = currentYear;
+
+        // Cek apakah sudah ada entri untuk bulan dan nama yang sama
+        function checkExistingEntry() {
+            const nama = document.getElementById('nama').value.trim();
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            
+            if (!nama || !bulan || !tahun) return;
+            
+            const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+            const existingEntry = data.find(entry => 
+                entry.nama === nama && 
+                entry.bulan === bulan && 
+                entry.tahun === tahun
+            );
+            
+            const warningDiv = document.getElementById('warningMessage');
+            
+            if (existingEntry) {
+                warningDiv.textContent = `⚠ PERINGATAN: Anda sudah mengisi mutabaah untuk ${getMonthName(bulan)} ${tahun}. Data baru akan menggantikan data lama.`;
+                warningDiv.className = 'warning-message show';
+                
+                // Isi form dengan data yang sudah ada
+                document.getElementById('gender').value = existingEntry.gender;
+                document.getElementById('kelas').value = existingEntry.kelas;
+                document.getElementById('jenisPengurus').value = existingEntry.jenis;
+                document.getElementById('divisi').value = existingEntry.divisi;
+                document.getElementById('salatBerjamaah').value = existingEntry.activityPoints.salatBerjamaah;
+                document.getElementById('salatRawatib').value = existingEntry.activityPoints.salatRawatib;
+                document.getElementById('salatDhuha').value = existingEntry.activityPoints.salatDhuha;
+                document.getElementById('salatTahajjud').value = existingEntry.activityPoints.salatTahajjud;
+                document.getElementById('tilawah').value = existingEntry.activityPoints.tilawah;
+                document.getElementById('murajaah').value = existingEntry.activityPoints.murajaah;
+                document.getElementById('infak').value = existingEntry.activityPoints.infak;
+                document.getElementById('silaturahmi').value = existingEntry.activityPoints.silaturahmi;
+                document.getElementById('puasaSunnah').value = existingEntry.activityPoints.puasaSunnah;
+                document.getElementById('membacaBuku').value = existingEntry.activityPoints.membacaBuku;
+                document.getElementById('olahraga').value = existingEntry.activityPoints.olahraga;
+            } else {
+                warningDiv.className = 'warning-message';
+            }
+        }
+
+        // Helper function untuk mendapatkan nama bulan
+        function getMonthName(monthNumber) {
+            const monthNames = {
+                '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+                '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+                '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+            };
+            return monthNames[monthNumber] || monthNumber;
+        }
+
+        // Event listener untuk input nama
+        document.getElementById('nama').addEventListener('change', checkExistingEntry);
+
+        // Form submission
+        document.getElementById('mutabaahForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Ambil semua nilai dari form
+            const nama = document.getElementById('nama').value.trim();
+            const divisi = document.getElementById('divisi').value;
+            const bulan = document.getElementById('bulan').value;
+            const tahun = document.getElementById('tahun').value;
+            const jenis = document.getElementById('jenisPengurus').value;
+            const gender = document.getElementById('gender').value;
+            const kelas = document.getElementById('kelas').value;
+            
+            // Validasi field wajib
+            if (!nama || !divisi || !bulan || !tahun || !jenis || !gender || !kelas) {
+                alert('Isi semua field wajib!');
+                return;
+            }
+            
+            // Ambil nilai langsung tanpa perkalian
+            const activityPoints = {
+                salatBerjamaah: parseInt(document.getElementById('salatBerjamaah').value) || 0,
+                salatRawatib: parseInt(document.getElementById('salatRawatib').value) || 0,
+                salatDhuha: parseInt(document.getElementById('salatDhuha').value) || 0,
+                salatTahajjud: parseInt(document.getElementById('salatTahajjud').value) || 0,
+                tilawah: parseInt(document.getElementById('tilawah').value) || 0,
+                murajaah: parseInt(document.getElementById('murajaah').value) || 0,
+                infak: parseInt(document.getElementById('infak').value) || 0,
+                silaturahmi: parseInt(document.getElementById('silaturahmi').value) || 0,
+                puasaSunnah: parseInt(document.getElementById('puasaSunnah').value) || 0,
+                membacaBuku: parseInt(document.getElementById('membacaBuku').value) || 0,
+                olahraga: parseInt(document.getElementById('olahraga').value) || 0
+            };
+            
+            // Hitung total poin (jumlah langsung dari input)
+            const points = Object.values(activityPoints).reduce((sum, p) => sum + p, 0);
+            
+            // Simpan data ke localStorage
+            let data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+            
+            // Cek apakah sudah ada entri untuk bulan dan nama yang sama
+            const existingIndex = data.findIndex(entry => 
+                entry.nama === nama && 
+                entry.bulan === bulan && 
+                entry.tahun === tahun
+            );
+            
+            let actionType = 'disimpan'; // 'disimpan' atau 'diperbarui'
+            
+            if (existingIndex !== -1) {
+                // Ganti data lama dengan data baru
+                data[existingIndex] = { 
+                    nama, 
+                    divisi, 
+                    bulan, 
+                    tahun, 
+                    points, 
+                    activityPoints, 
+                    jenis,
+                    gender,
+                    kelas
+                };
+                actionType = 'diperbarui';
+            } else {
+                // Tambah data baru
+                data.push({ 
+                    nama, 
+                    divisi, 
+                    bulan, 
+                    tahun, 
+                    points, 
+                    activityPoints, 
+                    jenis,
+                    gender,
+                    kelas
+                });
+            }
+            
+            localStorage.setItem('mutabaahData', JSON.stringify(data));
+            
+            // Tampilkan konfirmasi
+            alert(`Mutabaah berhasil ${actionType}!\n\nNama: ${nama}\nGender: ${gender}\nKelas: ${kelas}\nJenis: ${jenis}\nDivisi: ${divisi}\nPeriode: ${getMonthName(bulan)} ${tahun}\nTotal Poin: ${points}`);
+            
+            // Reset form (kecuali bulan dan tahun)
+            this.reset();
+            document.getElementById('bulan').value = currentMonth;
+            document.getElementById('tahun').value = currentYear;
+            document.getElementById('gender').value = '';
+            document.getElementById('kelas').value = '';
+            document.getElementById('jenisPengurus').value = '';
+            document.getElementById('divisi').value = '';
+            
+            // Sembunyikan warning message
+            document.getElementById('warningMessage').className = 'warning-message';
+        });
+    </script>
+</body>
+</html>

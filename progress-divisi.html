@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Divisi - Markaz Islami</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        :root {
+            --primary: #736b23;
+            --secondary: #9ade24;
+            --accent: #f5de3e;
+            --light: #ecf0f1;
+            --dark: #0d0a06;
+            --text: #333;
+            --text-light: #777;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+        header { background-color: white; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
+        .logo-icon { width: 40px; height: 40px; background-color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--primary); font-weight: bold; }
+        .menu-btn { display: flex; flex-direction: column; cursor: pointer; gap: 6px; }
+        .menu-btn span { width: 30px; height: 4px; background-color: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -8px); }
+        .dropdown { position: absolute; top: 100%; right: 5%; background-color: white; min-width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
+        .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown a { display: block; padding: 14px 20px; color: var(--text); text-decoration: none; font-size: 1.1rem; transition: background 0.3s ease; }
+        .dropdown a:hover { background-color: var(--light); }
+        main { margin-top: 80px; padding: 2rem 5%; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: var(--primary); text-align: center; margin: 2rem 0; }
+        .section-title { text-align: center; color: var(--primary); margin: 4rem 0 2rem; font-size: 1.8rem; }
+        .chart-container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); height: 500px; position: relative; margin-bottom: 3rem; }
+        .chart-container.detail { height: 520px; }
+        .chart-scroll-wrapper { overflow-x: auto; padding-bottom: 10px; }
+        canvas { max-height: 100%; width: auto !important; min-width: 900px; }
+        .no-data { text-align: center; color: var(--text-light); font-style: italic; font-size: 1.2rem; margin: 4rem 0; }
+        .reset-btn { display: block; margin: 3rem auto; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; font-size: 1rem; }
+        #detailCharts { display: flex; flex-direction: column; gap: 4rem; }
+        .filter-container { 
+            background: white; 
+            padding: 1.5rem;
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            margin: 2rem auto 1.5rem; 
+            max-width: 700px;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-end;
+        }
+        .filter-row:last-child {
+            margin-bottom: 0;
+            justify-content: center;
+            padding-top: 0.5rem;
+        }
+        .filter-group { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-label { 
+            font-weight: bold; 
+            color: var(--primary); 
+            margin-bottom: 0.5rem; 
+            font-size: 0.9rem;
+        }
+        .filter-select, .filter-input { 
+            padding: 0.8rem; 
+            border: 1px solid var(--text-light); 
+            border-radius: 8px; 
+            font-size: 1rem; 
+        }
+        .filter-btn { 
+            background: var(--secondary); 
+            color: var(--dark); 
+            padding: 0.8rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-btn:hover { background: var(--accent); }
+        .filter-reset { 
+            background: #95a5a6; 
+            color: white; 
+            padding: 0.8rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-reset:hover { background: #7f8c8d; }
+        .filter-info { 
+            text-align: center; 
+            color: var(--primary); 
+            font-weight: bold; 
+            margin: 1rem 0; 
+            font-size: 1.1rem;
+        }
+        .divisi-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        .stat-card .stat-detail {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .chart-container { height: 420px; }
+            .chart-container.detail { height: 460px; }
+            canvas { min-width: 800px; }
+            .filter-row { flex-direction: column; }
+            .filter-group { width: 100%; }
+            .divisi-stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">MI</div>
+            <div>Mutabaah Aktivis<br><span style="font-size: 0.9rem; opacity: 0.9;">Markaz Islami</span></div>
+        </div>
+        <div class="menu-btn" id="menuBtn">
+            <span></span><span></span><span></span>
+        </div>
+        <nav class="dropdown" id="dropdown">
+            <a href="index.html">Beranda</a>
+            <a href="isi-mutabaah.html">Isi Mutabaah</a>
+            <a href="progress-divisi.html">Progress Divisi</a>
+            <a href="peringkat-divisi.html">Peringkat Divisi</a> <!-- TAMBAHKAN INI -->
+            <a href="peringkat-anggota.html">Peringkat Anggota</a>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Progress Divisi</h1>
+
+            <!-- Filter Section -->
+            <div class="filter-container">
+                <!-- Baris 1: Gender dan Kelas -->
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Gender</div>
+                        <select id="filterGender" class="filter-select">
+                            <option value="">Semua Gender</option>
+                            <option value="Ikhwan">Ikhwan</option>
+                            <option value="Akhwat">Akhwat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Kelas</div>
+                        <select id="filterKelas" class="filter-select">
+                            <option value="">Semua Kelas</option>
+                            <option value="X">X</option>
+                            <option value="XI">XI</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Baris 2: Bulan dan Tahun -->
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Bulan</div>
+                        <select id="filterBulan" class="filter-select">
+                            <option value="">Semua Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Tahun</div>
+                        <select id="filterTahun" class="filter-select">
+                            <option value="">Semua Tahun</option>
+                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Baris 3: Button -->
+                <div class="filter-row">
+                    <button class="filter-btn" onclick="applyFilters()">Terapkan Filter</button>
+                    <button class="filter-reset" onclick="resetFilters()">Reset Filter</button>
+                </div>
+            </div>
+
+            <!-- Info Filter Aktif -->
+            <div id="filterInfo" class="filter-info"></div>
+
+            <!-- Statistik Divisi -->
+            <div class="section-title">Statistik Total Poin per Divisi</div>
+            <div id="divisiStats" class="divisi-stats"></div>
+
+            <!-- Overall Progress Chart -->
+            <div class="section-title">Total Poin per Divisi</div>
+            <div class="chart-container">
+                <canvas id="overallProgressChart"></canvas>
+            </div>
+            <div id="overallNoData" class="no-data">Belum ada data mutabaah untuk filter yang dipilih.</div>
+
+            <!-- Detail Charts per Divisi -->
+            <div class="section-title">Detail Aktivitas per Divisi</div>
+            <p style="text-align:center; margin-bottom:4rem; color:var(--text-light);">Total poin per aktivitas. Geser ke kanan jika label tidak muat di layar.</p>
+            <div id="detailCharts"></div>
+            <div id="detailNoData" class="no-data">Belum ada data dengan detail aktivitas untuk filter yang dipilih.</div>
+
+            <!-- <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data (Testing)</button> -->
+        </div>
+    </main>
+    <script>
+        Chart.register(ChartDataLabels);
+
+        // Menu script
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('dropdown');
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            dropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                menuBtn.classList.remove('active');
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Data setup
+        const divisions = ['PHT', 'staff inti', 'PSDM', 'SYIDAK', 'DKMA', 'JWR'];
+        const activityKeys = ['salatBerjamaah', 'salatRawatib', 'salatDhuha', 'salatTahajjud', 'tilawah', 'murajaah', 'infak', 'silaturahmi', 'puasaSunnah', 'membacaBuku', 'olahraga'];
+        const activityLabels = [
+            'Jamaah &/ tepat waktu',
+            'Rawatib',
+            'Dhuha',
+            'Tahajjud',
+            'Tilawah',
+            'Murajaah',
+            'Infak',
+            'Silaturahmi',
+            'Puasa Sunah',
+            'Membaca Buku',
+            'Olahraga'
+        ];
+
+        // Filter data
+        let currentFilters = {
+            bulan: '',
+            tahun: '',
+            gender: '',
+            kelas: ''
+        };
+
+        function getFilteredData() {
+            const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+            
+            if (!currentFilters.bulan && !currentFilters.tahun && !currentFilters.gender && !currentFilters.kelas) {
+                return data;
+            }
+            
+            return data.filter(entry => {
+                if (currentFilters.bulan && entry.bulan !== currentFilters.bulan) return false;
+                if (currentFilters.tahun && entry.tahun !== currentFilters.tahun) return false;
+                if (currentFilters.gender && entry.gender !== currentFilters.gender) return false;
+                if (currentFilters.kelas && entry.kelas !== currentFilters.kelas) return false;
+                return true;
+            });
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                bulan: document.getElementById('filterBulan').value,
+                tahun: document.getElementById('filterTahun').value,
+                gender: document.getElementById('filterGender').value,
+                kelas: document.getElementById('filterKelas').value
+            };
+            
+            updateFilterInfo();
+            renderCharts();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterBulan').value = '';
+            document.getElementById('filterTahun').value = '';
+            document.getElementById('filterGender').value = '';
+            document.getElementById('filterKelas').value = '';
+            
+            currentFilters = {
+                bulan: '',
+                tahun: '',
+                gender: '',
+                kelas: ''
+            };
+            
+            updateFilterInfo();
+            renderCharts();
+        }
+
+        function updateFilterInfo() {
+            const infoDiv = document.getElementById('filterInfo');
+            const filters = [];
+            
+            const monthNames = {
+                '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+                '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+                '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+            };
+            
+            if (currentFilters.gender) filters.push(`Gender: ${currentFilters.gender}`);
+            if (currentFilters.kelas) filters.push(`Kelas: ${currentFilters.kelas}`);
+            if (currentFilters.bulan) filters.push(`Bulan: ${monthNames[currentFilters.bulan]}`);
+            if (currentFilters.tahun) filters.push(`Tahun: ${currentFilters.tahun}`);
+            
+            if (filters.length > 0) {
+                infoDiv.textContent = `Filter Aktif: ${filters.join(' | ')}`;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.textContent = 'Menampilkan semua data';
+                infoDiv.style.display = 'block';
+            }
+        }
+
+        // Render charts
+        let overallChart = null;
+        let detailCharts = [];
+
+        function renderCharts() {
+            const filteredData = getFilteredData();
+            
+            // Destroy existing charts
+            if (overallChart) overallChart.destroy();
+            detailCharts.forEach(chart => chart.destroy());
+            detailCharts = [];
+            document.getElementById('detailCharts').innerHTML = '';
+            document.getElementById('divisiStats').innerHTML = '';
+            
+            // Hitung statistik total per divisi
+            const divisiStatsOverall = {};
+            divisions.forEach(div => divisiStatsOverall[div] = {totalPoints: 0, totalEntries: 0, members: new Set()});
+            
+            let hasOverallData = false;
+            filteredData.forEach(entry => {
+                if (entry.divisi && divisions.includes(entry.divisi)) {
+                    divisiStatsOverall[entry.divisi].totalPoints += entry.points || 0;
+                    divisiStatsOverall[entry.divisi].totalEntries += 1;
+                    divisiStatsOverall[entry.divisi].members.add(entry.nama);
+                    hasOverallData = true;
+                }
+            });
+            
+            // Tampilkan statistik divisi
+            const divisiStatsContainer = document.getElementById('divisiStats');
+            
+            divisions.forEach(div => {
+                const stats = divisiStatsOverall[div];
+                if (stats.totalEntries === 0) return;
+                
+                const memberCount = stats.members.size;
+                const avgPerEntry = Math.round(stats.totalPoints / stats.totalEntries);
+                const avgPerMember = Math.round(stats.totalPoints / memberCount);
+                
+                const statCard = document.createElement('div');
+                statCard.className = 'stat-card';
+                statCard.innerHTML = `
+                    <h3>${div}</h3>
+                    <div class="stat-number">${stats.totalPoints}</div>
+                    <div class="stat-detail">
+                        Total Poin<br>
+                        ${stats.totalEntries} entri dari ${memberCount} anggota<br>
+                        Rata-rata: ${avgPerEntry} poin/entri<br>
+                        Rata-rata: ${avgPerMember} poin/anggota
+                    </div>
+                `;
+                divisiStatsContainer.appendChild(statCard);
+            });
+            
+            // Jika tidak ada data
+            if (!hasOverallData) {
+                divisiStatsContainer.innerHTML = '<div class="no-data" style="grid-column: 1/-1">Belum ada data mutabaah untuk filter yang dipilih.</div>';
+            }
+            
+            // Data untuk chart overall (TOTAL POIN, bukan rata-rata)
+            const overallTotals = divisions.map(div => divisiStatsOverall[div].totalPoints);
+            const overallEntries = divisions.map(div => divisiStatsOverall[div].totalEntries);
+            
+            document.getElementById('overallNoData').style.display = hasOverallData ? 'none' : 'block';
+            
+            if (hasOverallData) {
+                const maxOverallTotal = Math.max(...overallTotals, 0);
+                const suggestedOverallMax = maxOverallTotal > 0 ? maxOverallTotal + Math.max(20, maxOverallTotal * 0.2) : 200;
+                
+                const ctxOverall = document.getElementById('overallProgressChart').getContext('2d');
+                overallChart = new Chart(ctxOverall, {
+                    type: 'bar',
+                    data: { 
+                        labels: divisions, 
+                        datasets: [{ 
+                            label: 'Total Poin', 
+                            data: overallTotals, 
+                            backgroundColor: 'rgba(154, 222, 36, 0.8)', 
+                            borderColor: '#736b23', 
+                            borderWidth: 2, 
+                            borderRadius: 8, 
+                            borderSkipped: false, 
+                            maxBarThickness: 80 
+                        }] 
+                    },
+                    options: {
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { 
+                                callbacks: { 
+                                    label: ctx => 'Total Poin: ' + ctx.parsed.y, 
+                                    afterLabel: ctx => 'Entri: ' + overallEntries[ctx.dataIndex] + ' data' 
+                                } 
+                            },
+                            datalabels: { 
+                                anchor: 'end', 
+                                align: 'top', 
+                                font: { weight: 'bold', size: 16 }, 
+                                color: '#333', 
+                                formatter: v => v > 0 ? v + ' poin' : '' 
+                            }
+                        },
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                suggestedMax: suggestedOverallMax, 
+                                ticks: { stepSize: Math.ceil(suggestedOverallMax / 10) }, 
+                                title: { 
+                                    display: true, 
+                                    text: 'Total Poin',
+                                    font: { weight: 'bold', size: 14 }
+                                } 
+                            }, 
+                            x: { 
+                                grid: { display: false }, 
+                                title: { 
+                                    display: true, 
+                                    text: 'Divisi',
+                                    font: { weight: 'bold', size: 14 }
+                                } 
+                            } 
+                        }
+                    }
+                });
+            }
+            
+            // Detail Charts per Divisi (TOTAL per aktivitas, bukan rata-rata)
+            const divisiStatsDetail = {};
+            divisions.forEach(div => divisiStatsDetail[div] = { 
+                totalEntries: 0, 
+                activityTotals: activityKeys.reduce((o, k) => ({...o, [k]: 0}), {}),
+                gender: { Ikhwan: 0, Akhwat: 0 },
+                kelas: { X: 0, XI: 0 }
+            });
+            
+            let hasDetailData = false;
+            filteredData.forEach(entry => {
+                if (entry.divisi && entry.activityPoints && divisions.includes(entry.divisi)) {
+                    const s = divisiStatsDetail[entry.divisi];
+                    s.totalEntries += 1;
+                    if (entry.gender) s.gender[entry.gender]++;
+                    if (entry.kelas) s.kelas[entry.kelas]++;
+                    activityKeys.forEach(k => s.activityTotals[k] += entry.activityPoints[k] || 0);
+                    hasDetailData = true;
+                }
+            });
+            
+            document.getElementById('detailNoData').style.display = hasDetailData ? 'none' : 'block';
+            
+            if (hasDetailData) {
+                const detailChartsContainer = document.getElementById('detailCharts');
+                
+                divisions.forEach((div, index) => {
+                    const stats = divisiStatsDetail[div];
+                    if (stats.totalEntries === 0) return;
+                    
+                    const totals = activityKeys.map(k => stats.activityTotals[k]);
+                    const maxTotal = Math.max(...totals, 0);
+                    const suggestedMax = maxTotal > 0 ? maxTotal + Math.max(10, maxTotal * 0.2) : 50;
+                    
+                    // Hitung persentase gender dan kelas
+                    const ikhwanPercent = Math.round((stats.gender.Ikhwan / stats.totalEntries) * 100);
+                    const akhwatPercent = Math.round((stats.gender.Akhwat / stats.totalEntries) * 100);
+                    const xPercent = Math.round((stats.kelas.X / stats.totalEntries) * 100);
+                    const xiPercent = Math.round((stats.kelas.XI / stats.totalEntries) * 100);
+                    
+                    const section = document.createElement('div');
+                    section.innerHTML = `
+                        <h3 style="text-align: center; color: var(--primary); margin-bottom: 0.5rem;">Divisi ${div}</h3>
+                        <p style="text-align: center; margin-bottom: 0.5rem; color: var(--text-light);">
+                            ${stats.totalEntries} entri | Gender: ${ikhwanPercent}% Ikhwan, ${akhwatPercent}% Akhwat | Kelas: ${xPercent}% X, ${xiPercent}% XI
+                        </p>
+                        <div class="chart-container detail">
+                            <div class="chart-scroll-wrapper">
+                                <canvas id="detailChart${index}"></canvas>
+                            </div>
+                        </div>
+                    `;
+                    detailChartsContainer.appendChild(section);
+                    
+                    const ctx = document.getElementById(`detailChart${index}`).getContext('2d');
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: { 
+                            labels: activityLabels, 
+                            datasets: [{ 
+                                label: 'Total Poin', 
+                                data: totals, 
+                                backgroundColor: 'rgba(154, 222, 36, 0.8)', 
+                                borderColor: '#736b23', 
+                                borderWidth: 2, 
+                                borderRadius: 8, 
+                                borderSkipped: false 
+                            }] 
+                        },
+                        options: {
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => 'Total Poin: ' + ctx.parsed.y
+                                    }
+                                },
+                                datalabels: { 
+                                    anchor: 'end', 
+                                    align: 'top', 
+                                    font: { weight: 'bold', size: 14 }, 
+                                    color: '#333', 
+                                    formatter: v => v > 0 ? v + ' poin' : '' 
+                                }
+                            },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true, 
+                                    suggestedMax: suggestedMax, 
+                                    ticks: { stepSize: Math.ceil(suggestedMax / 10) }, 
+                                    title: { 
+                                        display: true, 
+                                        text: 'Total Poin',
+                                        font: { weight: 'bold', size: 14 }
+                                    } 
+                                },
+                                x: { 
+                                    grid: { display: false }, 
+                                    title: { 
+                                        display: true, 
+                                        text: 'Aktivitas Ibadah',
+                                        font: { weight: 'bold', size: 14 }
+                                    }, 
+                                    ticks: { 
+                                        maxRotation: 0, 
+                                        minRotation: 0, 
+                                        autoSkip: false,
+                                        font: { size: 12 }
+                                    } 
+                                }
+                            }
+                        }
+                    });
+                    
+                    detailCharts.push(chart);
+                });
+            }
+        }
+
+        // Initialize
+        updateFilterInfo();
+        renderCharts();
+    </script>
+</body>
+</html>

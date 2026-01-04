@@ -1,0 +1,138 @@
+<!-- File 1: index.html (Beranda - Diperbarui dengan ringkasan dinamis sederhana) -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutabaah Aktivis Markaz Islami</title>
+    <style>
+        :root {
+            --primary: #736b23;
+            --secondary: #9ade24;
+            --accent: #f5de3e;
+            --light: #ecf0f1;
+            --dark: #0d0a06;
+            --text: #333;
+            --text-light: #777;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+        header { background-color: white; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
+        .logo-icon { width: 40px; height: 40px; background-color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--primary); font-weight: bold; }
+        .menu-btn { display: flex; flex-direction: column; cursor: pointer; gap: 6px; }
+        .menu-btn span { width: 30px; height: 4px; background-color: var(--text); border-radius: 2px; transition: all 0.3s ease; }
+        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -8px); }
+        .dropdown { position: absolute; top: 100%; right: 5%; background-color: white; min-width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
+        .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown a { display: block; padding: 14px 20px; color: var(--text); text-decoration: none; font-size: 1.1rem; transition: background 0.3s ease; }
+        .dropdown a:hover { background-color: var(--light); }
+        main { margin-top: 80px; padding: 2rem 5%; min-height: calc(100vh - 80px); }
+        .welcome { text-align: center; padding: 4rem 0; background: linear-gradient(135deg, var(--secondary), var(--accent)); color: var(--primary); border-radius: 12px; margin-bottom: 3rem; }
+        .welcome h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .welcome p { font-size: 1.2rem; max-width: 800px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 3rem 0; }
+        .stat-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+        .stat-card h3 { color: var(--primary); margin-bottom: 0.5rem; }
+        .stat-card p { font-size: 2rem; font-weight: bold; color: var(--secondary); }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem; }
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s ease; }
+        .card:hover { transform: translateY(-10px); }
+        .card h3 { color: var(--primary); margin-bottom: 1rem; font-size: 1.6rem; }
+        .btn { display: inline-block; background: var(--secondary); color: var(--dark); padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 1.5rem; transition: 0.3s; }
+        .btn:hover { background: var(--accent); }
+        .reset-btn { display: block; margin: 3rem auto; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; }
+        @media (max-width: 768px) { .logo { font-size: 1.2rem; } .welcome h1 { font-size: 2rem; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">MI</div>
+            <div>Mutabaah Aktivis<br><span style="font-size: 0.9rem; opacity: 0.9;">Markaz Islami</span></div>
+        </div>
+        <div class="menu-btn" id="menuBtn">
+            <span></span><span></span><span></span>
+        </div>
+        <nav class="dropdown" id="dropdown">
+            <a href="index.html">Beranda</a>
+            <a href="isi-mutabaah.html">Isi Mutabaah</a>
+            <a href="progress-divisi.html">Progress Divisi</a>
+            <a href="peringkat-divisi.html">Peringkat Divisi</a> <!-- TAMBAHKAN INI -->
+            <a href="peringkat-anggota.html">Peringkat Anggota</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <h1>Selamat Datang di Sistem Mutabaah</h1>
+            <p>Aktivis Markaz Islami — Pantau ibadah, kemajuan divisi, dan peringkat anggota secara real-time dari data mutabaah yang diisi.</p>
+        </section>
+
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Ringkasan Data Mutabaah</h2>
+            <div class="stats" id="stats">
+                <div class="stat-card"><h3>Total Entri Mutabaah</h3><p id="totalEntries">0</p></div>
+                <div class="stat-card"><h3>Jumlah Anggota Aktif</h3><p id="totalMembers">0</p></div>
+                <div class="stat-card"><h3>Rata-rata Poin Harian</h3><p id="avgPoints">0</p></div>
+            </div>
+
+            <h2 style="text-align: center; margin: 3rem 0 2rem;">Menu Utama</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>Isi Mutabaah</h3>
+                    <p>Catat dan pantau ibadah harian Anda secara rutin.</p>
+                    <a href="isi-mutabaah.html" class="btn">Buka</a>
+                </div>
+                <div class="card">
+                    <h3>Progress Divisi</h3>
+                    <p>Lihat kemajuan rata-rata mutabaah tiap divisi (berdasarkan data mutabaah).</p>
+                    <a href="progress-divisi.html" class="btn">Buka</a>
+                </div>
+                <div class="card">
+                    <h3>Peringkat Anggota</h3>
+                    <p>Leaderboard anggota berdasarkan total poin mutabaah kumulatif.</p>
+                    <a href="peringkat-anggota.html" class="btn">Buka</a>
+                </div>
+            </div>
+
+            <!-- <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data (Testing)</button> -->
+        </div>
+    </main>
+
+    <script>
+        // Menu script
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('dropdown');
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            dropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                menuBtn.classList.remove('active');
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Ringkasan dinamis di beranda
+        const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+
+        const totalEntries = data.length;
+        const members = new Set(data.map(entry => entry.nama)).size;
+        const totalPoints = data.reduce((sum, entry) => sum + entry.points, 0);
+        const avgPoints = totalEntries > 0 ? Math.round(totalPoints / totalEntries) : 0;
+
+        document.getElementById('totalEntries').textContent = totalEntries;
+        document.getElementById('totalMembers').textContent = members;
+        document.getElementById('avgPoints').textContent = avgPoints;
+    </script>
+</body>
+</html>
