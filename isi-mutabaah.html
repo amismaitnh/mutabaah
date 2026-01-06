@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Isi Mutabaah - Markaz Islami</title>
+    <title>Isi Mutabaah - AMI</title>
     <style>
         :root {
             --primary: #736b23;
@@ -16,36 +17,77 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
-        header { background-color: white; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+          header { background-color: white; color: var(--text); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
-        .logo-icon { width: 40px; height: 40px; background-color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--primary); font-weight: bold; }
-        .menu-btn { display: flex; flex-direction: column; cursor: pointer; gap: 6px; }
-        .menu-btn span { width: 30px; height: 4px; background-color: var(--text); border-radius: 2px; transition: all 0.3s ease; }
-        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
-        .menu-btn.active span:nth-child(2) { opacity: 0; }
-        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -8px); }
-        .dropdown { position: absolute; top: 100%; right: 5%; background-color: white; min-width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
-        .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
-        .dropdown a { display: block; padding: 14px 20px; color: var(--text); text-decoration: none; font-size: 1.1rem; transition: background 0.3s ease; }
-        .dropdown a:hover { background-color: var(--light); }
+        .logo-icon { width: 60px; height: 60px; border-radius: 50%; object-fit: contain; }
+.menu-btn { 
+    display: flex; 
+    flex-direction: column; 
+    cursor: none; 
+    gap: 6px; 
+}
+.menu-btn span { 
+    width: 30px; 
+    height: 4px; 
+    background-color: var(--text); 
+    border-radius: 2px; 
+    transition: background-color 0.2s ease; 
+}
+
+.dropdown { 
+    position: absolute; 
+    top: 100%; 
+    right: 5%; 
+    background-color: white; 
+    min-width: 220px; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95) translateY(-8px);
+    transform-origin: top right;
+    transition: none;  /* PENTING: tidak ada transisi saat hidden → hilang langsung */
+}
+
+.dropdown.active { 
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+    transition: opacity 0.18s ease-out, 
+                transform 0.18s ease-out;  /* hanya animasi saat muncul */
+}
+
+.dropdown a { 
+    display: block; 
+    padding: 14px 20px; 
+    color: var(--text); 
+    text-decoration: none; 
+    font-size: 1.1rem; 
+    transition: background 0.2s ease;
+    cursor: none;
+}
+.dropdown a:active {
+    background-color: var(--light);
+}
         main { margin-top: 80px; padding: 2rem 5%; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
-        h1 { color: var(--primary); text-align: center; margin: 2rem 0; }
+        h1 { font-size: 2rem; color: var(--text); text-align: center; margin: 2rem 0; }
         form { max-width: 700px; margin: 0 auto; background: white; padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--primary); }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: var(--text); }
         .form-group small { display: block; color: var(--text-light); font-weight: normal; font-size: 0.9rem; margin-top: 0.3rem; }
-        .form-group input, .form-group select { width: 100%; padding: 1rem; border: 1px solid var(--text-light); border-radius: 8px; font-size: 1rem; }
-        .submit-btn { background: var(--secondary); color: var(--dark); padding: 1rem 2rem; border: none; border-radius: 50px; font-size: 1.1rem; cursor: pointer; width: 100%; margin-top: 2rem; transition: 0.3s; }
-        .submit-btn:hover { background: var(--accent); }
-        .reset-btn { display: block; margin: 3rem auto 0; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; }
+        .form-group input, .form-group select { width: 100%; padding: 1rem; border: 1px solid var(--text-light); border-radius: 8px; font-size: 1rem; background: transparent; outline: none; color: var(--text); }
+        .submit-btn { background: var(--secondary); color: white; padding: 1rem 2rem; border: none; border-radius: 50px; font-size: 1.1rem; cursor: none; width: 100%; margin-top: 2rem; transition: 0.3s; }
+        .submit-btn:active { background: var(--accent); }
+        .reset-btn { display: block; margin: 3rem auto 0; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: none; }
         .note { text-align: center; color: var(--text-light); margin: 2rem 0; font-style: italic; font-size: 1rem; }
         .form-row { display: flex; gap: 1rem; }
         .form-row .form-group { flex: 1; }
         .warning-message {
-            background-color: #fff3cd;
-            border: 1px solid #ffc107;
-            color: #856404;
+            background-color: white;
+            border: 1px solid white;
+            color: red;
             padding: 1rem;
             border-radius: 8px;
             margin: 1rem 0;
@@ -60,28 +102,97 @@
             .form-row { flex-direction: column; gap: 0; }
             .form-group { margin-bottom: 1rem; }
         }
+        .dropdown .menu-parent {
+    display: block;
+    padding: 14px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: background 0.2s ease;
+    position: relative;
+    cursor: none;
+}
+
+.dropdown .menu-parent:active {
+    background-color: var(--light);
+}
+
+.dropdown .arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 1.4rem;
+    transition: transform 0.2s ease;
+}
+
+.dropdown .menu-parent.active .arrow {
+    transform: translateY(-50%) rotate(270deg);
+}
+
+.dropdown .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.dropdown .submenu.active {
+    max-height: 400px; /* cukup untuk 2-3 item */
+}
+
+.dropdown .submenu a {
+    padding: 12px 40px;
+    font-size: 1rem;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.dropdown .submenu a:active {
+    background-color: var(--light);
+}
+
+/* Perbaikan usability: ubah cursor menjadi pointer agar jelas bisa diklik */
+.dropdown a,
+.menu-btn,
+.menu-parent {
+    cursor: none !important;
+}
     </style>
 </head>
 <body>
     <header>
         <div class="logo">
-            <div class="logo-icon">MI</div>
-            <div>Mutabaah Aktivis<br><span style="font-size: 0.9rem; opacity: 0.9;">Markaz Islami</span></div>
-        </div>
+    <a href="index.html"><img src="logo.png" alt="Logo Markaz Islami" class="logo-icon"></a>
+    <h3>Aktivis Markaz Islami</h3>
+</div>
         <div class="menu-btn" id="menuBtn">
             <span></span><span></span><span></span>
         </div>
         <nav class="dropdown" id="dropdown">
-            <a href="index.html">Beranda</a>
-            <a href="isi-mutabaah.html">Isi Mutabaah</a>
-            <a href="progress-divisi.html">Progress Divisi</a>
-            <a href="peringkat-divisi.html">Peringkat Divisi</a> <!-- TAMBAHKAN INI -->
-            <a href="peringkat-anggota.html">Peringkat Anggota</a>
-        </nav>
+    <a href="isi-mutabaah.html">Isi Mutabaah</a>
+    
+    <div class="menu-parent" id="progressToggle">
+        Progress <span class="arrow">&gt;</span>
+    </div>
+    <div class="submenu" id="progressSubmenu">
+        <a href="progress-pengurus.html">Pengurus</a>
+        <a href="progress-divisi.html">Divisi</a>
+    </div>
+    
+    <div class="menu-parent" id="peringkatToggle">
+        Peringkat <span class="arrow">&gt;</span>
+    </div>
+    <div class="submenu" id="peringkatSubmenu">
+        <a href="peringkat-anggota.html">Anggota</a>
+        <a href="peringkat-divisi.html">Divisi</a>
+    </div>
+</nav>
     </header>
     <main>
         <div class="container">
-            <h1>Isi Mutabaah Harian</h1>
+            <h1>Isi Mutabaah</h1>
         
             <!-- Warning Message -->
             <div id="warningMessage" class="warning-message"></div>
@@ -233,7 +344,7 @@
                         <select id="divisi" required>
                             <option value="">Pilih Divisi</option>
                             <option>PHT</option>
-                            <option>staff inti</option>
+                            <option>Staff Inti</option>
                             <option>PSDM</option>
                             <option>SYIDAK</option>
                             <option>DKMA</option>
@@ -269,19 +380,19 @@
                 </div>
 
                 <!-- Ibadah Harian -->
-                <h2 style="text-align:left; margin: 3rem 0 2rem; color: var(--primary);">Ibadah Harian</h2>
+                <h2 style="text-align:left; margin: 3rem 0 2rem; color: var(--text);">Ibadah Harian</h2>
                 
                 <div class="form-group">
                     <label>Salat Berjamaah dan/atau Tepat Waktu 
                         <small>Target: 25–35 kali/pekan</small>
                     </label>
-                    <input type="number" min="0" id="salatBerjamaah" placeholder="Jumlah waktu salat wajib (0-5)" value="0">
+                    <input type="number" min="0" max="35" id="salatBerjamaah" placeholder="Jumlah waktu salat wajib (0-5)" value="0">
                 </div>
                 <div class="form-group">
                     <label>Salat Sunah Rawatib 
                         <small>Target: 21–35 kali/pekan</small>
                     </label>
-                    <input type="number" min="0" id="salatRawatib" placeholder="Jumlah pelaksanaan" value="0">
+                    <input type="number" min="0" max="56" id="salatRawatib" placeholder="Jumlah pelaksanaan" value="0">
                 </div>
                 <div class="form-group">
                     <label>Salat Dhuha 
@@ -343,178 +454,365 @@
             <!-- <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data (Testing)</button> -->
         </div>
     </main>
-    <script>
-        // Menu script
-        const menuBtn = document.getElementById('menuBtn');
-        const dropdown = document.getElementById('dropdown');
-        menuBtn.addEventListener('click', () => {
-            menuBtn.classList.toggle('active');
-            dropdown.classList.toggle('active');
-        });
-        document.addEventListener('click', (e) => {
-            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
-                menuBtn.classList.remove('active');
-                dropdown.classList.remove('active');
-            }
-        });
+<script>
+    // === MENU TOGGLE (Hamburger + Submenu Progress & Peringkat) ===
+    const menuBtn = document.getElementById('menuBtn');
+    const dropdown = document.getElementById('dropdown');
 
-        // Set default bulan ke bulan saat ini
-        const now = new Date();
-        const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-        const currentYear = now.getFullYear();
+    // Toggle submenu
+    const progressToggle = document.getElementById('progressToggle');
+    const progressSubmenu = document.getElementById('progressSubmenu');
+    const peringkatToggle = document.getElementById('peringkatToggle');
+    const peringkatSubmenu = document.getElementById('peringkatSubmenu');
+
+    menuBtn.addEventListener('click', () => {
+        menuBtn.classList.toggle('active');
+        dropdown.classList.toggle('active');
+    });
+
+    progressToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        progressSubmenu.classList.toggle('active');
+        progressToggle.classList.toggle('active');
+
+        peringkatSubmenu.classList.remove('active');
+        peringkatToggle.classList.remove('active');
+    });
+
+    peringkatToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        peringkatSubmenu.classList.toggle('active');
+        peringkatToggle.classList.toggle('active');
+
+        progressSubmenu.classList.remove('active');
+        progressToggle.classList.remove('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+            menuBtn.classList.remove('active');
+            dropdown.classList.remove('active');
+
+            progressSubmenu.classList.remove('active');
+            peringkatSubmenu.classList.remove('active');
+            progressToggle.classList.remove('active');
+            peringkatToggle.classList.remove('active');
+        }
+    });
+
+    // === SET DEFAULT BULAN & TAHUN KE TANGGAL SAAT INI ===
+    const now = new Date();
+    const currentMonth = (now.getMonth() + 1).toString().padStart(2, '0');
+    const currentYear = now.getFullYear();
+
+    document.getElementById('bulan').value = currentMonth;
+    document.getElementById('tahun').value = currentYear;
+
+    // === DATA ANGGOTA (Auto-fill Gender, Kelas, Jenis Pengurus, Divisi) ===
+    const memberData = {
+        // Ikhwan - XI - Pengurus Harian Tetap - PHT
+        "Ahsanurrizqi": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Alimul Haq Al Fatih": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Fauzan Rijalul Jaddid": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Fathir Hanifan Romadloni": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Yusuf Azzam Hafi": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Umar Fakhruddin Khairullah": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Syauqi Firdaus Fiiridhotillah": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+
+        // Akhwat - XI - Pengurus Harian Tetap - PHT
+        "Azmina Tsania Mafaza": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Alifah Hasna Setyawan": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Aqila Hanin Najiyya": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Hasna Rifaya Nafiah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Tsabita Al Firdaus": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Annisa Zulfa Salsabila": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Aisyah Mar'atus Sholikah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+        "Alyaa Widya Arza Sentosa": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Tetap", divisi: "PHT" },
+
+        // Ikhwan - X - Pengurus Harian Lengkap - Staff Inti
+        "Farid Abrar Ramadhan": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+        "Zalfan Almundzir": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+        "Ahmad Ali Nafis Mujahir": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+        "Muhammad Faisal Iqbal": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+
+        // Akhwat - X - Pengurus Harian Lengkap - Staff Inti
+        "Athiya Khaerunnisa": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+        "Alma Ryzqya Ramadhani": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+        "Najwa Nur Azizah": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+        "Aulia Devina Omantin": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "Staff Inti" },
+
+        // Ikhwan - X - Pengurus Harian Lengkap - PSDM
+        "Fachryza Zuhair Nabil Arrazaq": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Fadhil Abdillah Ramadhan": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Muhammad Fathrizkzein Zidane": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Muhammad Muzdahir Syafiq": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+
+        // Akhwat - X - Pengurus Harian Lengkap - PSDM
+        "Najwa Aqilla Janitra": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Qanita Sharah Hafizhah": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Zainab Asshabira": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Afra Mufidah Riyadi": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Nabila Tsabita Rahmania": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+
+        // Ikhwan - XI - Pengurus Harian Lengkap - PSDM
+        "Syafiq Aufa Asykari": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Yasqi Azka Argani": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Ahmad Althaf Rizqillah": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Naufal Ariq Saputra": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+
+        // Akhwat - XI - Pengurus Harian Lengkap - PSDM
+        "Aqila Adzkia": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Aufa Nissa' Al Majidah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Faizah Mufidatun Azizah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Fanny Afnan Jannati": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Zharifah Himmah Al Alyyah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+        "Farah Asysan Syifa": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "PSDM" },
+
+        // Ikhwan - X - Pengurus Harian Lengkap - SYIDAK
+        "Muhammad Tsaqib Hilmi A.": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Naufal Ghoniyun Karim": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Reyza Emirsyah Hidayat": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Tsabit Abdussalam Akif N. S.": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+
+        // Akhwat - X - Pengurus Harian Lengkap - SYIDAK
+        "Aisya Nadira": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Hasna Dzakia Salma K.": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Kainuna Regita Khairunnisa": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Zahratul Khoiriyyah": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Sholiha Bilqis Trikurnia": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+
+        // Ikhwan - XI - Pengurus Harian Lengkap - SYIDAK
+        "Fadly Maulana An-Nafi": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Nidzar Hammam Ismath": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Hidayat Nur Aziz": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Muhammad Imanulhaq": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+
+        // Akhwat - XI - Pengurus Harian Lengkap - SYIDAK
+        "Azalia Rahma Nirmala Dewi": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Najla Khairunnisa": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Khansa Putri Risdianto": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Arkani Kayla Khairunnisa": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Ayesha Ahnaf Hammasyah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Khonza Adzkia": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+        "Chandrika Kania Damara": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "SYIDAK" },
+
+        // Ikhwan - X - Pengurus Harian Lengkap - DKMA
+        "Rais Hikari": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Miftahuddin Ghoffar As Sidiq": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Affan Rasyid Ilman": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Rizqi Akhtar Putra Sunanda": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+
+        // Akhwat - X - Pengurus Harian Lengkap - DKMA
+        "Athaya Yasmin Althafunnisa": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Khansa": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Zalyani Niswatun Nafi'ah": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Ikhtia Hauraya Annizar": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Nisa'ul Akmaal G. M. N. L.": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Hilya Nada Aufia": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+
+        // Ikhwan - XI - Pengurus Harian Lengkap - DKMA
+        "Maulana Ibnu Faiq": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Zaky Zydan Ramtizi": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Azzam Nur Tsabita Arif": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Zufar Abdillah Tsaqif": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+
+        // Akhwat - XI - Pengurus Harian Lengkap - DKMA
+        "Aderisti Maurelia Putri": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Aliya Nuha Humaira Mushoffa": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Nada Zaafarani Assyifa": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Syarifah Nugraheningsih": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Salwaa Alyaa' Prameshwari": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Rofi Munajati": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+        "Keyla Nurkhasna Qoni'ah": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "DKMA" },
+
+        // Ikhwan - X - Pengurus Harian Lengkap - JWR
+        "Andrew Shea": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Ayyash Dhiyaulhaq Cunggin": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Gaozhan Wiby Al-Karimi": { gender: "Ikhwan", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+
+        // Akhwat - X - Pengurus Harian Lengkap - JWR
+        "Alya Dini Khoirunnisa": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Hayan Hadi Gunjaya": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Ibrahim Banu Atiro": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Lathifah Lubna Azizah": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Runaisha Afra Shofia A.": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Luthfia Inafi Muthi'ah": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Veisya Saffaina Sasongko": { gender: "Akhwat", kelas: "X", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+
+        // Ikhwan - XI - Pengurus Harian Lengkap - JWR
+        "Rafif Syauqi Nashrullah": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Hanan Ahmad Mukhayyar": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Zaidan Rais Altair": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Rizqullah Jihada Muhsin": { gender: "Ikhwan", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+
+        // Akhwat - XI - Pengurus Harian Lengkap - JWR
+        "Ba'ayu Febria Ristika": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Fatimah Naura Ulya": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Haura Nada Tsabita": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Nafisa Azka Armandriani": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Rona Karima": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" },
+        "Annisa Rahma Aji": { gender: "Akhwat", kelas: "XI", jenis: "Pengurus Harian Lengkap", divisi: "JWR" }
+    };
+
+    // Fungsi auto-fill field lain berdasarkan nama
+    function autoFillFields() {
+        const namaInput = document.getElementById('nama');
+        const nama = namaInput.value.trim();
+        const data = memberData[nama];
+
+        if (data) {
+            document.getElementById('gender').value = data.gender;
+            document.getElementById('kelas').value = data.kelas;
+            document.getElementById('jenisPengurus').value = data.jenis;
+            document.getElementById('divisi').value = data.divisi;
+        }
+    }
+
+    // Event auto-fill saat nama berubah
+    document.getElementById('nama').addEventListener('input', autoFillFields);
+    document.getElementById('nama').addEventListener('change', autoFillFields);
+
+    // Helper untuk nama bulan
+    function getMonthName(monthNumber) {
+        const monthNames = {
+            '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+            '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+            '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+        };
+        return monthNames[monthNumber] || monthNumber;
+    }
+
+    // Cek apakah sudah ada entri untuk bulan dan nama yang sama
+    function checkExistingEntry() {
+        const nama = document.getElementById('nama').value.trim();
+        const bulan = document.getElementById('bulan').value;
+        const tahun = document.getElementById('tahun').value;
+        
+        if (!nama || !bulan || !tahun) return;
+        
+        const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+        const existingEntry = data.find(entry => 
+            entry.nama === nama && 
+            entry.bulan === bulan && 
+            entry.tahun === tahun
+        );
+        
+        const warningDiv = document.getElementById('warningMessage');
+        
+        if (existingEntry) {
+            warningDiv.textContent = `⚠ PERINGATAN: Anda sudah mengisi mutabaah untuk ${getMonthName(bulan)} ${tahun}. Data baru akan menggantikan data lama.`;
+            warningDiv.className = 'warning-message show';
+            
+            // Isi form dengan data yang sudah ada
+            document.getElementById('gender').value = existingEntry.gender;
+            document.getElementById('kelas').value = existingEntry.kelas;
+            document.getElementById('jenisPengurus').value = existingEntry.jenis;
+            document.getElementById('divisi').value = existingEntry.divisi;
+            document.getElementById('salatBerjamaah').value = existingEntry.activityPoints.salatBerjamaah;
+            document.getElementById('salatRawatib').value = existingEntry.activityPoints.salatRawatib;
+            document.getElementById('salatDhuha').value = existingEntry.activityPoints.salatDhuha;
+            document.getElementById('salatTahajjud').value = existingEntry.activityPoints.salatTahajjud;
+            document.getElementById('tilawah').value = existingEntry.activityPoints.tilawah;
+            document.getElementById('murajaah').value = existingEntry.activityPoints.murajaah;
+            document.getElementById('infak').value = existingEntry.activityPoints.infak;
+            document.getElementById('silaturahmi').value = existingEntry.activityPoints.silaturahmi;
+            document.getElementById('puasaSunnah').value = existingEntry.activityPoints.puasaSunnah;
+            document.getElementById('membacaBuku').value = existingEntry.activityPoints.membacaBuku;
+            document.getElementById('olahraga').value = existingEntry.activityPoints.olahraga;
+        } else {
+            warningDiv.className = 'warning-message';
+        }
+    }
+
+    // Event listener untuk perubahan bulan/tahun/nama
+    document.getElementById('bulan').addEventListener('change', checkExistingEntry);
+    document.getElementById('tahun').addEventListener('change', checkExistingEntry);
+    document.getElementById('nama').addEventListener('change', checkExistingEntry);
+
+    // Prefill nama dari localStorage + auto-fill field lain
+    window.addEventListener('DOMContentLoaded', () => {
+        const userName = localStorage.getItem('mutabaahUserName');
+        if (userName) {
+            const namaInput = document.getElementById('nama');
+            namaInput.value = userName;
+            autoFillFields();
+            checkExistingEntry();
+        }
+    });
+
+    // Form submission
+    document.getElementById('mutabaahForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const nama = document.getElementById('nama').value.trim();
+        const divisi = document.getElementById('divisi').value;
+        const bulan = document.getElementById('bulan').value;
+        const tahun = document.getElementById('tahun').value;
+        const jenis = document.getElementById('jenisPengurus').value;
+        const gender = document.getElementById('gender').value;
+        const kelas = document.getElementById('kelas').value;
+        
+        if (!nama || !divisi || !bulan || !tahun || !jenis || !gender || !kelas) {
+            alert('Isi semua field wajib!');
+            return;
+        }
+        
+        const activityPoints = {
+            salatBerjamaah: parseInt(document.getElementById('salatBerjamaah').value) || 0,
+            salatRawatib: parseInt(document.getElementById('salatRawatib').value) || 0,
+            salatDhuha: parseInt(document.getElementById('salatDhuha').value) || 0,
+            salatTahajjud: parseInt(document.getElementById('salatTahajjud').value) || 0,
+            tilawah: parseInt(document.getElementById('tilawah').value) || 0,
+            murajaah: parseInt(document.getElementById('murajaah').value) || 0,
+            infak: parseInt(document.getElementById('infak').value) || 0,
+            silaturahmi: parseInt(document.getElementById('silaturahmi').value) || 0,
+            puasaSunnah: parseInt(document.getElementById('puasaSunnah').value) || 0,
+            membacaBuku: parseInt(document.getElementById('membacaBuku').value) || 0,
+            olahraga: parseInt(document.getElementById('olahraga').value) || 0
+        };
+        
+        const points = Object.values(activityPoints).reduce((sum, p) => sum + p, 0);
+        
+        let data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+        
+        const existingIndex = data.findIndex(entry => 
+            entry.nama === nama && 
+            entry.bulan === bulan && 
+            entry.tahun === tahun
+        );
+        
+        let actionType = 'disimpan';
+        
+        if (existingIndex !== -1) {
+            data[existingIndex] = { 
+                nama, divisi, bulan, tahun, points, activityPoints, jenis, gender, kelas
+            };
+            actionType = 'diperbarui';
+        } else {
+            data.push({ 
+                nama, divisi, bulan, tahun, points, activityPoints, jenis, gender, kelas
+            });
+        }
+        
+        localStorage.setItem('mutabaahData', JSON.stringify(data));
+        
+        // Simpan nama terbaru ke localStorage (untuk modal index.html)
+        localStorage.setItem('mutabaahUserName', nama);
+        
+        alert(`Mutabaah berhasil ${actionType}!\n\nNama: ${nama}\nGender: ${gender}\nKelas: ${kelas}\nJenis: ${jenis}\nDivisi: ${divisi}\nPeriode: ${getMonthName(bulan)} ${tahun}\nTotal Poin: ${points}`);
+        
+        // Reset form kecuali bulan & tahun
+        this.reset();
         document.getElementById('bulan').value = currentMonth;
         document.getElementById('tahun').value = currentYear;
-
-        // Cek apakah sudah ada entri untuk bulan dan nama yang sama
-        function checkExistingEntry() {
-            const nama = document.getElementById('nama').value.trim();
-            const bulan = document.getElementById('bulan').value;
-            const tahun = document.getElementById('tahun').value;
-            
-            if (!nama || !bulan || !tahun) return;
-            
-            const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
-            const existingEntry = data.find(entry => 
-                entry.nama === nama && 
-                entry.bulan === bulan && 
-                entry.tahun === tahun
-            );
-            
-            const warningDiv = document.getElementById('warningMessage');
-            
-            if (existingEntry) {
-                warningDiv.textContent = `⚠ PERINGATAN: Anda sudah mengisi mutabaah untuk ${getMonthName(bulan)} ${tahun}. Data baru akan menggantikan data lama.`;
-                warningDiv.className = 'warning-message show';
-                
-                // Isi form dengan data yang sudah ada
-                document.getElementById('gender').value = existingEntry.gender;
-                document.getElementById('kelas').value = existingEntry.kelas;
-                document.getElementById('jenisPengurus').value = existingEntry.jenis;
-                document.getElementById('divisi').value = existingEntry.divisi;
-                document.getElementById('salatBerjamaah').value = existingEntry.activityPoints.salatBerjamaah;
-                document.getElementById('salatRawatib').value = existingEntry.activityPoints.salatRawatib;
-                document.getElementById('salatDhuha').value = existingEntry.activityPoints.salatDhuha;
-                document.getElementById('salatTahajjud').value = existingEntry.activityPoints.salatTahajjud;
-                document.getElementById('tilawah').value = existingEntry.activityPoints.tilawah;
-                document.getElementById('murajaah').value = existingEntry.activityPoints.murajaah;
-                document.getElementById('infak').value = existingEntry.activityPoints.infak;
-                document.getElementById('silaturahmi').value = existingEntry.activityPoints.silaturahmi;
-                document.getElementById('puasaSunnah').value = existingEntry.activityPoints.puasaSunnah;
-                document.getElementById('membacaBuku').value = existingEntry.activityPoints.membacaBuku;
-                document.getElementById('olahraga').value = existingEntry.activityPoints.olahraga;
-            } else {
-                warningDiv.className = 'warning-message';
-            }
-        }
-
-        // Helper function untuk mendapatkan nama bulan
-        function getMonthName(monthNumber) {
-            const monthNames = {
-                '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
-                '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
-                '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
-            };
-            return monthNames[monthNumber] || monthNumber;
-        }
-
-        // Event listener untuk input nama
-        document.getElementById('nama').addEventListener('change', checkExistingEntry);
-
-        // Form submission
-        document.getElementById('mutabaahForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Ambil semua nilai dari form
-            const nama = document.getElementById('nama').value.trim();
-            const divisi = document.getElementById('divisi').value;
-            const bulan = document.getElementById('bulan').value;
-            const tahun = document.getElementById('tahun').value;
-            const jenis = document.getElementById('jenisPengurus').value;
-            const gender = document.getElementById('gender').value;
-            const kelas = document.getElementById('kelas').value;
-            
-            // Validasi field wajib
-            if (!nama || !divisi || !bulan || !tahun || !jenis || !gender || !kelas) {
-                alert('Isi semua field wajib!');
-                return;
-            }
-            
-            // Ambil nilai langsung tanpa perkalian
-            const activityPoints = {
-                salatBerjamaah: parseInt(document.getElementById('salatBerjamaah').value) || 0,
-                salatRawatib: parseInt(document.getElementById('salatRawatib').value) || 0,
-                salatDhuha: parseInt(document.getElementById('salatDhuha').value) || 0,
-                salatTahajjud: parseInt(document.getElementById('salatTahajjud').value) || 0,
-                tilawah: parseInt(document.getElementById('tilawah').value) || 0,
-                murajaah: parseInt(document.getElementById('murajaah').value) || 0,
-                infak: parseInt(document.getElementById('infak').value) || 0,
-                silaturahmi: parseInt(document.getElementById('silaturahmi').value) || 0,
-                puasaSunnah: parseInt(document.getElementById('puasaSunnah').value) || 0,
-                membacaBuku: parseInt(document.getElementById('membacaBuku').value) || 0,
-                olahraga: parseInt(document.getElementById('olahraga').value) || 0
-            };
-            
-            // Hitung total poin (jumlah langsung dari input)
-            const points = Object.values(activityPoints).reduce((sum, p) => sum + p, 0);
-            
-            // Simpan data ke localStorage
-            let data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
-            
-            // Cek apakah sudah ada entri untuk bulan dan nama yang sama
-            const existingIndex = data.findIndex(entry => 
-                entry.nama === nama && 
-                entry.bulan === bulan && 
-                entry.tahun === tahun
-            );
-            
-            let actionType = 'disimpan'; // 'disimpan' atau 'diperbarui'
-            
-            if (existingIndex !== -1) {
-                // Ganti data lama dengan data baru
-                data[existingIndex] = { 
-                    nama, 
-                    divisi, 
-                    bulan, 
-                    tahun, 
-                    points, 
-                    activityPoints, 
-                    jenis,
-                    gender,
-                    kelas
-                };
-                actionType = 'diperbarui';
-            } else {
-                // Tambah data baru
-                data.push({ 
-                    nama, 
-                    divisi, 
-                    bulan, 
-                    tahun, 
-                    points, 
-                    activityPoints, 
-                    jenis,
-                    gender,
-                    kelas
-                });
-            }
-            
-            localStorage.setItem('mutabaahData', JSON.stringify(data));
-            
-            // Tampilkan konfirmasi
-            alert(`Mutabaah berhasil ${actionType}!\n\nNama: ${nama}\nGender: ${gender}\nKelas: ${kelas}\nJenis: ${jenis}\nDivisi: ${divisi}\nPeriode: ${getMonthName(bulan)} ${tahun}\nTotal Poin: ${points}`);
-            
-            // Reset form (kecuali bulan dan tahun)
-            this.reset();
-            document.getElementById('bulan').value = currentMonth;
-            document.getElementById('tahun').value = currentYear;
-            document.getElementById('gender').value = '';
-            document.getElementById('kelas').value = '';
-            document.getElementById('jenisPengurus').value = '';
-            document.getElementById('divisi').value = '';
-            
-            // Sembunyikan warning message
-            document.getElementById('warningMessage').className = 'warning-message';
-        });
+        document.getElementById('gender').value = '';
+        document.getElementById('kelas').value = '';
+        document.getElementById('jenisPengurus').value = '';
+        document.getElementById('divisi').value = '';
+        
+        document.getElementById('warningMessage').className = 'warning-message';
+    });
+</script>
     </script>
 </body>
 </html>
