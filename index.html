@@ -1,4 +1,3 @@
-<!-- File 1: index.html (Beranda - Diperbarui dengan ringkasan dinamis sederhana) -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -21,118 +20,515 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
-        header { background-color: white; color: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        /* Tambahan: cegah scroll saat modal terbuka */
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        header { background-color: white; color: var(--text); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
-        .logo-icon { width: 40px; height: 40px; background-color: var(--secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--primary); font-weight: bold; }
-        .menu-btn { display: flex; flex-direction: column; cursor: pointer; gap: 6px; }
-        .menu-btn span { width: 30px; height: 4px; background-color: var(--text); border-radius: 2px; transition: all 0.3s ease; }
-        .menu-btn.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
-        .menu-btn.active span:nth-child(2) { opacity: 0; }
-        .menu-btn.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -8px); }
-        .dropdown { position: absolute; top: 100%; right: 5%; background-color: white; min-width: 220px; border-radius: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
-        .dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
-        .dropdown a { display: block; padding: 14px 20px; color: var(--text); text-decoration: none; font-size: 1.1rem; transition: background 0.3s ease; }
-        .dropdown a:hover { background-color: var(--light); }
+        .logo-icon { width: 60px; height: 60px; border-radius: 50%; object-fit: contain; }
+        .menu-btn { 
+            display: flex; 
+            flex-direction: column; 
+            cursor: none; 
+            gap: 6px; 
+        }
+        .menu-btn span { 
+            width: 30px; 
+            height: 4px; 
+            background-color: var(--text); 
+            border-radius: 2px; 
+            transition: background-color 0.2s ease; 
+        }
+
+        .dropdown { 
+            position: absolute; 
+            top: 100%; 
+            right: 5%; 
+            background-color: white; 
+            min-width: 220px; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95) translateY(-8px);
+            transform-origin: top right;
+            transition: none;
+        }
+
+        .dropdown.active { 
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            transition: opacity 0.18s ease-out, 
+                        transform 0.18s ease-out;
+        }
+
+        .dropdown a { 
+            display: block; 
+            padding: 14px 20px; 
+            color: var(--text); 
+            text-decoration: none; 
+            font-size: 1.1rem; 
+            transition: background 0.2s ease; 
+            cursor: none;
+        }
+        .dropdown a:active {
+            background-color: var(--light);
+        }
+
+        /* Submenu styles */
+        .dropdown .menu-parent {
+            display: block;
+            padding: 14px 20px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background 0.2s ease;
+            position: relative;
+            cursor: none;
+        }
+        .dropdown .menu-parent:active {
+            background-color: var(--light);
+        }
+        .dropdown .arrow {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.4rem;
+            transition: transform 0.2s ease;
+        }
+        .dropdown .menu-parent.active .arrow {
+            transform: translateY(-50%) rotate(90deg);
+        }
+        .dropdown .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .dropdown .submenu.active {
+            max-height: 400px;
+        }
+        .dropdown .submenu a {
+            padding: 12px 40px;
+            font-size: 1rem;
+        }
+
         main { margin-top: 80px; padding: 2rem 5%; min-height: calc(100vh - 80px); }
-        .welcome { text-align: center; padding: 4rem 0; background: linear-gradient(135deg, var(--secondary), var(--accent)); color: var(--primary); border-radius: 12px; margin-bottom: 3rem; }
-        .welcome h1 { font-size: 2.5rem; margin-bottom: 1rem; }
-        .welcome p { font-size: 1.2rem; max-width: 800px; margin: 0 auto; }
+        .welcome { text-align: center; padding: 3rem 0; color: var(--text); margin-bottom: 3rem; margin-top: 3rem; }
+        .welcome h1 { font-size: 3rem; margin-bottom: 1rem; }
         .container { max-width: 1200px; margin: 0 auto; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 3rem 0; }
-        .stat-card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
-        .stat-card h3 { color: var(--primary); margin-bottom: 0.5rem; }
-        .stat-card p { font-size: 2rem; font-weight: bold; color: var(--secondary); }
+        .container h2 { font-size: 2rem; }
+        .container p { text-align: center; }
+        .what { border-radius: 12px; padding: 4rem 5%; background-color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
         .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem; }
         .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s ease; }
-        .card:hover { transform: translateY(-10px); }
-        .card h3 { color: var(--primary); margin-bottom: 1rem; font-size: 1.6rem; }
-        .btn { display: inline-block; background: var(--secondary); color: var(--dark); padding: 1rem 2rem; border-radius: 50px; text-decoration: none; font-weight: bold; margin-top: 1.5rem; transition: 0.3s; }
-        .btn:hover { background: var(--accent); }
-        .reset-btn { display: block; margin: 3rem auto; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: pointer; }
-        @media (max-width: 768px) { .logo { font-size: 1.2rem; } .welcome h1 { font-size: 2rem; } }
+        .goals { padding: 1rem 5%; }
+        .goals h2 { color: var(--text); font-size: 2rem; }
+        .card h3 { color: var(--text); margin-bottom: 1rem; font-size: 1.6rem; }
+        .card p { color: var(--text); }
+        .reset-btn { display: block; margin: 5rem auto; padding: 1rem 2rem; background: #e74c3c; color: white; border: none; border-radius: 50px; cursor: none; }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 3rem 2rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .modal-content h2 {
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        .modal .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .modal .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        /* Custom Select untuk Nama (fix dropdown di Chrome) */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+        .custom-select input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--text-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: transparent;
+            outline: none;
+            cursor: none;
+        }
+        .custom-select .options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--text-light);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .custom-select .options.active {
+            display: block;
+        }
+        .custom-select .options li {
+            padding: 12px 16px;
+            cursor: none;
+            transition: background 0.2s;
+        }
+        .custom-select .options li:hover {
+            background: var(--light);
+        }
+        .custom-select .options li.no-result {
+            color: var(--text-light);
+            font-style: italic;
+            cursor: default;
+        }
+
+        .modal .submit-btn {
+            background: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: none;
+            width: 100%;
+            margin-top: 1rem;
+            transition: 0.3s;
+        }
+        .modal .submit-btn:active {
+            background: var(--accent);
+        }
+        .modal .close {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: var(--text-light);
+            cursor: none;
+        }
+        .modal .close:hover {
+            color: var(--text);
+        }
+        .modal .skip {
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        .modal .skip a {
+            color: var(--text);
+            text-decoration: underline;
+            cursor: none;
+        }
+
+        @media (max-width: 768px) { 
+            .logo { font-size: 1.2rem; } 
+            .welcome h1 { font-size: 2rem; } 
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="logo">
-            <div class="logo-icon">MI</div>
-            <div>Mutabaah Aktivis<br><span style="font-size: 0.9rem; opacity: 0.9;">Markaz Islami</span></div>
+            <a href="index.html"><img src="logo.png" alt="Logo Markaz Islami" class="logo-icon"></a>
+            <h3>Aktivis Markaz Islami</h3>
         </div>
         <div class="menu-btn" id="menuBtn">
             <span></span><span></span><span></span>
         </div>
         <nav class="dropdown" id="dropdown">
-            <a href="index.html">Beranda</a>
             <a href="isi-mutabaah.html">Isi Mutabaah</a>
-            <a href="progress-divisi.html">Progress Divisi</a>
-            <a href="peringkat-divisi.html">Peringkat Divisi</a> <!-- TAMBAHKAN INI -->
-            <a href="peringkat-anggota.html">Peringkat Anggota</a>
+            
+            <div class="menu-parent" id="progressToggle">
+                Progress <span class="arrow">&gt;</span>
+            </div>
+            <div class="submenu" id="progressSubmenu">
+                <a href="progress-pengurus.html">Jenis Pengurus</a>
+                <a href="progress-divisi.html">Divisi</a>
+            </div>
+            
+            <div class="menu-parent" id="peringkatToggle">
+                Peringkat <span class="arrow">&gt;</span>
+            </div>
+            <div class="submenu" id="peringkatSubmenu">
+                <a href="peringkat-anggota.html">Anggota</a>
+                <a href="peringkat-divisi.html">Divisi</a>
+            </div>
         </nav>
     </header>
 
     <main>
         <section class="welcome">
-            <h1>Selamat Datang di Sistem Mutabaah</h1>
-            <p>Aktivis Markaz Islami — Pantau ibadah, kemajuan divisi, dan peringkat anggota secara real-time dari data mutabaah yang diisi.</p>
+            <h1 id="welcomeTitle">Selamat Datang di Mutabaah AMI</h1>
         </section>
 
         <div class="container">
-            <h2 style="text-align: center; margin-bottom: 2rem;">Ringkasan Data Mutabaah</h2>
-            <div class="stats" id="stats">
-                <div class="stat-card"><h3>Total Entri Mutabaah</h3><p id="totalEntries">0</p></div>
-                <div class="stat-card"><h3>Jumlah Anggota Aktif</h3><p id="totalMembers">0</p></div>
-                <div class="stat-card"><h3>Rata-rata Poin Harian</h3><p id="avgPoints">0</p></div>
+            <div class="what">
+                <h2 style="text-align: center; margin-bottom: 2rem;">Apa itu Mutabaah AMI ?</h2>
+                <p>Mutabaah AMI merupakan sarana pembinaan dan evaluasi amalan ibadah sehari-hari sebagai upaya membentuk pribadi yang beriman, berakhlak mulia, dan beristiqamah. Kegiatan ini bertujuan untuk menumbuhkan kesadaran spiritual, meningkatkan kedisiplinan dalam beribadah, serta memperkuat karakter Islami para aktivis dalam kehidupan sekolah maupun bermasyarakat.</p>
             </div>
 
-            <h2 style="text-align: center; margin: 3rem 0 2rem;">Menu Utama</h2>
-            <div class="cards">
-                <div class="card">
-                    <h3>Isi Mutabaah</h3>
-                    <p>Catat dan pantau ibadah harian Anda secara rutin.</p>
-                    <a href="isi-mutabaah.html" class="btn">Buka</a>
-                </div>
-                <div class="card">
-                    <h3>Progress Divisi</h3>
-                    <p>Lihat kemajuan rata-rata mutabaah tiap divisi (berdasarkan data mutabaah).</p>
-                    <a href="progress-divisi.html" class="btn">Buka</a>
-                </div>
-                <div class="card">
-                    <h3>Peringkat Anggota</h3>
-                    <p>Leaderboard anggota berdasarkan total poin mutabaah kumulatif.</p>
-                    <a href="peringkat-anggota.html" class="btn">Buka</a>
+            <div class="goals">
+                <h2 style="text-align: center; margin: 3rem 0 2rem;">Tujuan</h2>
+                <div class="cards">
+                    <div class="card">
+                        <h3>Kesadaran Beribadah</h3>
+                        <p>Menumbuhkan kesadaran beribadah sebagai kebutuhan utama dalam kehidupan sehari-hari.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Pembiasaan Amalan Harian</h3>
+                        <p>Membiasakan amalan ibadah harian secara rutin dan teratur sesuai tuntunan Islam.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Disiplin dan Tanggung Jawab</h3>
+                        <p>Meningkatkan kedisiplinan dan tanggung jawab aktivis dalam menjaga kualitas ibadah.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Pembentukan Akhlak Islami</h3>
+                        <p>Membentuk pribadi yang beriman dan berakhlak mulia melalui pembinaan ruhiyah yang berkelanjutan.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Muhasabah dan Evaluasi Diri</h3>
+                        <p>Menjadi sarana evaluasi dan muhasabah diri terhadap pelaksanaan ibadah harian.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Penguatan Budaya Islami Sekolah</h3>
+                        <p>Mendukung terwujudnya budaya Islami di lingkungan SMAIT Nur Hidayah Sukoharjo.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data (Testing)</button> -->
+            <button class="reset-btn" onclick="if(confirm('Reset semua data mutabaah?')) { localStorage.removeItem('mutabaahData'); location.reload(); }">Reset Semua Data</button>
         </div>
     </main>
 
+    <!-- Modal Input Nama dengan Custom Dropdown -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Selamat Datang!</h2>
+            <p style="margin-bottom: 15px;">Silakan masukkan nama Anda.</p>
+            <div class="form-group">
+                <div class="custom-select">
+                    <input type="text" id="modalNameInput" placeholder="Ketik untuk cari atau klik untuk lihat semua" autocomplete="off">
+                    <div class="options" id="modalOptions">
+                        <ul id="modalOptionsList"></ul>
+                    </div>
+                </div>
+            </div>
+            <button class="submit-btn" id="saveNameBtn">Simpan Nama</button>
+            <div class="skip"><a href="#" id="skipLink">Lewati untuk sekarang</a></div>
+        </div>
+    </div>
+
     <script>
-        // Menu script
+        // Daftar semua nama
+        const nameList = [
+            "Ahsanurrizqi","Azmina Tsania Mafaza","Alimul Haq Al Fatih","Alifah Hasna Setyawan","Aqila Hanin Najiyya",
+            "Farid Abrar Ramadhan","Zalfan Almundzir","Athiya Khaerunnisa","Alma Ryzqya Ramadhani","Fauzan Rijalul Jaddid",
+            "Hasna Rifaya Nafiah","Ahmad Ali Nafis Mujahir","Muhammad Faisal Iqbal","Najwa Nur Azizah","Aulia Devina Omantin",
+            "Fathir Hanifan Romadloni","Tsabita Al Firdaus","Syafiq Aufa Asykari","Yasqi Azka Argani","Ahmad Althaf Rizqillah",
+            "Naufal Ariq Saputra","Fachryza Zuhair Nabil Arrazaq","Fadhil Abdillah Ramadhan","Muhammad Fathrizkzein Zidane",
+            "Muhammad Muzdahir Syafiq","Aqila Adzkia","Aufa Nissa' Al Majidah","Faizah Mufidatun Azizah","Fanny Afnan Jannati",
+            "Zharifah Himmah Al Alyyah","Farah Asysan Syifa","Najwa Aqilla Janitra","Qanita Sharah Hafizhah","Zainab Asshabira",
+            "Afra Mufidah Riyadi","Nabila Tsabita Rahmania","Yusuf Azzam Hafi","Annisa Zulfa Salsabila","Fadly Maulana An-Nafi",
+            "Nidzar Hammam Ismath","Hidayat Nur Aziz","Muhammad Imanulhaq","Muhammad Tsaqib Hilmi A.","Naufal Ghoniyun Karim",
+            "Reyza Emirsyah Hidayat","Tsabit Abdussalam Akif N. S.","Azalia Rahma Nirmala Dewi","Najla Khairunnisa",
+            "Khansa Putri Risdianto","Arkani Kayla Khairunnisa","Ayesha Ahnaf Hammasyah","Khonza Adzkia","Chandrika Kania Damara",
+            "Aisya Nadira","Hasna Dzakia Salma K.","Kainuna Regita Khairunnisa","Zahratul Khoiriyyah","Sholiha Bilqis Trikurnia",
+            "Umar Fakhruddin Khairullah","Aisyah Mar'atus Sholikah","Maulana Ibnu Faiq","Zaky Zydan Ramtizi",
+            "Azzam Nur Tsabita Arif","Zufar Abdillah Tsaqif","Rais Hikari","Miftahuddin Ghoffar As Sidiq","Affan Rasyid Ilman",
+            "Rizqi Akhtar Putra Sunanda","Aderisti Maurelia Putri","Aliya Nuha Humaira Mushoffa","Nada Zaafarani Assyifa",
+            "Syarifah Nugraheningsih","Salwaa Alyaa' Prameshwari","Rofi Munajati","Keyla Nurkhasna Qoni'ah",
+            "Athaya Yasmin Althafunnisa","Khansa","Zalyani Niswatun Nafi'ah","Ikhtia Hauraya Annizar",
+            "Nisa'ul Akmaal G. M. N. L.","Hilya Nada Aufia","Syauqi Firdaus Fiiridhotillah","Alyaa Widya Arza Sentosa",
+            "Rafif Syauqi Nashrullah","Hanan Ahmad Mukhayyar","Zaidan Rais Altair","Rizqullah Jihada Muhsin","Andrew Shea",
+            "Ayyash Dhiyaulhaq Cunggin","Gaozhan Wiby Al-Karimi","Ba'ayu Febria Ristika","Fatimah Naura Ulya",
+            "Haura Nada Tsabita","Nafisa Azka Armandriani","Rona Karima","Annisa Rahma Aji","Alya Dini Khoirunnisa",
+            "Hayan Hadi Gunjaya","Ibrahim Banu Atiro","Lathifah Lubna Azizah","Runaisha Afra Shofia A.",
+            "Luthfia Inafi Muthi'ah","Veisya Saffaina Sasongko"
+        ];
+
+        // Menu toggle + submenu
         const menuBtn = document.getElementById('menuBtn');
         const dropdown = document.getElementById('dropdown');
+        const progressToggle = document.getElementById('progressToggle');
+        const progressSubmenu = document.getElementById('progressSubmenu');
+        const peringkatToggle = document.getElementById('peringkatToggle');
+        const peringkatSubmenu = document.getElementById('peringkatSubmenu');
+
         menuBtn.addEventListener('click', () => {
             menuBtn.classList.toggle('active');
             dropdown.classList.toggle('active');
         });
+
+        progressToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            progressSubmenu.classList.toggle('active');
+            progressToggle.classList.toggle('active');
+            peringkatSubmenu.classList.remove('active');
+            peringkatToggle.classList.remove('active');
+        });
+
+        peringkatToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            peringkatSubmenu.classList.toggle('active');
+            peringkatToggle.classList.toggle('active');
+            progressSubmenu.classList.remove('active');
+            progressToggle.classList.remove('active');
+        });
+
         document.addEventListener('click', (e) => {
             if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
                 menuBtn.classList.remove('active');
                 dropdown.classList.remove('active');
+                progressSubmenu.classList.remove('active');
+                peringkatSubmenu.classList.remove('active');
+                progressToggle.classList.remove('active');
+                peringkatToggle.classList.remove('active');
             }
         });
 
-        // Ringkasan dinamis di beranda
-        const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+        // Custom dropdown untuk modal nama
+        const modalNameInput = document.getElementById('modalNameInput');
+        const modalOptions = document.getElementById('modalOptions');
+        const modalOptionsList = document.getElementById('modalOptionsList');
 
+        function populateNameOptions(filter = '') {
+            modalOptionsList.innerHTML = '';
+            const filtered = nameList.filter(name => 
+                name.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'Tidak ditemukan';
+                li.className = 'no-result';
+                modalOptionsList.appendChild(li);
+            } else {
+                filtered.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name;
+                    li.dataset.value = name;
+                    li.addEventListener('click', () => {
+                        modalNameInput.value = name;
+                        modalOptions.classList.remove('active');
+                    });
+                    modalOptionsList.appendChild(li);
+                });
+            }
+        }
+
+        modalNameInput.addEventListener('click', () => {
+            populateNameOptions('');
+            modalOptions.classList.add('active');
+        });
+
+        modalNameInput.addEventListener('focus', () => {
+            populateNameOptions(modalNameInput.value.trim());
+            modalOptions.classList.add('active');
+        });
+
+        modalNameInput.addEventListener('input', () => {
+            populateNameOptions(modalNameInput.value.trim());
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!modalNameInput.contains(e.target) && !modalOptions.contains(e.target)) {
+                modalOptions.classList.remove('active');
+            }
+        });
+
+        // Modal logic + prevent scroll
+        const nameModal = document.getElementById('nameModal');
+        const saveNameBtn = document.getElementById('saveNameBtn');
+        const closeBtn = document.querySelector('#nameModal .close');
+        const skipLink = document.getElementById('skipLink');
+        const welcomeTitle = document.getElementById('welcomeTitle');
+
+        function openModal() {
+            nameModal.classList.add('active');
+            document.body.classList.add('modal-open'); // Cegah scroll
+            populateNameOptions();
+        }
+
+        function closeModal() {
+            nameModal.classList.remove('active');
+            document.body.classList.remove('modal-open'); // Izinkan scroll kembali
+        }
+
+        const savedName = localStorage.getItem('mutabaahUserName');
+
+        if (savedName) {
+            welcomeTitle.innerHTML = `Selamat Datang, ${savedName}!`;
+        } else {
+            openModal();
+        }
+
+        saveNameBtn.addEventListener('click', () => {
+            const name = modalNameInput.value.trim();
+            if (name && nameList.includes(name)) {
+                localStorage.setItem('mutabaahUserName', name);
+                welcomeTitle.innerHTML = `Selamat Datang, ${name}!`;
+                closeModal();
+            } else if (name) {
+                alert('Nama tidak valid. Pilih dari daftar.');
+            } else {
+                alert('Mohon masukkan nama Anda.');
+            }
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+        skipLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeModal();
+        });
+
+        // Ringkasan dinamis
+        const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
         const totalEntries = data.length;
         const members = new Set(data.map(entry => entry.nama)).size;
         const totalPoints = data.reduce((sum, entry) => sum + entry.points, 0);
         const avgPoints = totalEntries > 0 ? Math.round(totalPoints / totalEntries) : 0;
 
-        document.getElementById('totalEntries').textContent = totalEntries;
-        document.getElementById('totalMembers').textContent = members;
-        document.getElementById('avgPoints').textContent = avgPoints;
+        if (document.getElementById('totalEntries')) document.getElementById('totalEntries').textContent = totalEntries;
+        if (document.getElementById('totalMembers')) document.getElementById('totalMembers').textContent = members;
+        if (document.getElementById('avgPoints')) document.getElementById('avgPoints').textContent = avgPoints;
     </script>
 </body>
 </html>
