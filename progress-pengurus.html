@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Pengurus - AMI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        :root {
+            --primary: #736b23;
+            --secondary: #9ade24;
+            --accent: #f5de3e;
+            --light: #ecf0f1;
+            --dark: #0d0a06;
+            --text: #333;
+            --text-light: #777;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+        header { background-color: white; color: var(--text); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { display: flex; align-items: center; font-size: 1.4rem; font-weight: bold; gap: 12px; }
+        .logo-icon { width: 60px; height: 60px; border-radius: 50%; object-fit: contain; }
+.menu-btn { 
+    display: flex; 
+    flex-direction: column; 
+    cursor: none; 
+    gap: 6px; 
+}
+.menu-btn span { 
+    width: 30px; 
+    height: 4px; 
+    background-color: var(--text); 
+    border-radius: 2px; 
+    transition: background-color 0.2s ease; 
+}
+
+.dropdown { 
+    position: absolute; 
+    top: 100%; 
+    right: 5%; 
+    background-color: white; 
+    min-width: 220px; 
+    border-radius: 8px; 
+    overflow: hidden; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.95) translateY(-8px);
+    transform-origin: top right;
+    transition: none;  /* PENTING: tidak ada transisi saat hidden → hilang langsung */
+}
+
+.dropdown.active { 
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateY(0);
+    transition: opacity 0.18s ease-out, 
+                transform 0.18s ease-out;  /* hanya animasi saat muncul */
+}
+
+.dropdown a { 
+    display: block; 
+    padding: 14px 20px; 
+    color: var(--text); 
+    text-decoration: none; 
+    font-size: 1.1rem; 
+    transition: background 0.2s ease;
+    cursor: none;
+}
+.dropdown a:active {
+    background-color: var(--light);
+}
+        main { margin-top: 80px; padding: 2rem 5%; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: ; color: var(--text); text-align: center; margin: 2rem 0; }
+        .section-title { text-align: center; color: var(--text); margin: 4rem 0 2rem; font-size: 1.8rem; font-weight: bold; }
+        .chart-container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); height: 500px; position: relative; margin-bottom: 3rem; }
+        .chart-container.detail { height: 520px; }
+        canvas { width: 100% !important; height: 100% !important; }
+        .no-data { text-align: center; color: var(--text-light); font-style: italic; font-size: 1.2rem; margin: 4rem 0; }
+        #detailCharts { display: flex; flex-direction: column; gap: 4rem; }
+        .filter-container { 
+            background: white; 
+            padding: 1.5rem;
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            margin: 2rem auto 1.5rem; 
+            max-width: 700px;
+        }
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-end;
+        }
+        .filter-row:last-child {
+            margin-bottom: 0;
+            justify-content: center;
+            padding-top: 0.5rem;
+        }
+        .filter-group { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-label { 
+            font-weight: bold; 
+            color: var(--text); 
+            margin-bottom: 0.5rem; 
+            font-size: 0.9rem;
+        }
+        .filter-select, .filter-input { 
+            padding: 0.8rem; 
+            border: 1px solid var(--text-light);
+            background: transparent;
+            border-radius: 8px; 
+            font-size: 1rem; 
+        }
+        .filter-btn { 
+            background: transparent; 
+            color: var(--dark); 
+            padding: 0.8rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: none; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-reset { 
+            background: transparent; 
+            color: var(--dark); 
+            padding: 0.8rem 1.5rem; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: none; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .filter-info { 
+            text-align: center; 
+            color: var(--dark); 
+            font-weight: bold; 
+            margin: 1rem 0; 
+            font-size: 1.1rem;
+        }
+        .jenis-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .stat-card .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+        .stat-card .stat-detail {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .chart-container { height: 420px; }
+            .chart-container.detail { height: 460px; }
+            .jenis-stats { grid-template-columns: 1fr; }
+        }
+.dropdown .menu-parent {
+    display: block;
+    padding: 14px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: background 0.2s ease;
+    position: relative;
+    cursor: none;
+}
+
+.dropdown .menu-parent:active {
+    background-color: var(--light);
+}
+
+.dropdown .arrow {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%) rotate(90deg);
+    font-size: 1.4rem;
+    transition: transform 0.2s ease;
+}
+
+.dropdown .menu-parent.active .arrow {
+    transform: translateY(-50%) rotate(270deg);
+}
+
+.dropdown .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.dropdown .submenu.active {
+    max-height: 400px; /* cukup untuk 2-3 item */
+}
+
+.dropdown .submenu a {
+    padding: 12px 40px;
+    font-size: 1rem;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.dropdown .submenu a:active {
+    background-color: var(--light);
+}
+
+/* Perbaikan usability: ubah cursor menjadi pointer agar jelas bisa diklik */
+.dropdown a,
+.menu-btn,
+.menu-parent {
+    cursor: none !important;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="Logo Markaz Islami" class="logo-icon"></a>
+            <h3>Aktivis Markaz Islami</h3>
+        </div>
+        <div class="menu-btn" id="menuBtn">
+            <span></span><span></span><span></span>
+        </div>
+        <nav class="dropdown" id="dropdown">
+    <a href="isi-mutabaah.html">Isi Mutabaah</a>
+    
+    <div class="menu-parent" id="progressToggle">
+        Progress <span class="arrow">&gt;</span>
+    </div>
+    <div class="submenu" id="progressSubmenu">
+        <a href="progress-pengurus.html">Pengurus</a>
+        <a href="progress-divisi.html">Divisi</a>
+    </div>
+    
+    <div class="menu-parent" id="peringkatToggle">
+        Peringkat <span class="arrow">&gt;</span>
+    </div>
+    <div class="submenu" id="peringkatSubmenu">
+        <a href="peringkat-anggota.html">Anggota</a>
+        <a href="peringkat-divisi.html">Divisi</a>
+    </div>
+</nav>
+    </header>
+    <main>
+        <div class="container">
+            <h1>Progress Pengurus</h1>
+
+            <div class="filter-container">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Gender</div>
+                        <select id="filterGender" class="filter-select">
+                            <option value="">Semua Gender</option>
+                            <option value="Ikhwan">Ikhwan</option>
+                            <option value="Akhwat">Akhwat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Kelas</div>
+                        <select id="filterKelas" class="filter-select">
+                            <option value="">Semua Kelas</option>
+                            <option value="X">X</option>
+                            <option value="XI">XI</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <div class="filter-label">Bulan</div>
+                        <select id="filterBulan" class="filter-select">
+                            <option value="">Semua Bulan</option>
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">Tahun</div>
+                        <select id="filterTahun" class="filter-select">
+                            <option value="">Semua Tahun</option>
+                            <option value="2025">2025</option>
+                            <option value="2026" selected>2026</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-row">
+                    <button class="filter-reset" onclick="resetFilters()">Reset Filter</button>
+                    <button class="filter-btn" onclick="applyFilters()">Terapkan Filter</button>
+                </div>
+            </div>
+
+            <div id="filterInfo" class="filter-info"></div>
+
+            <div class="section-title">Statistik Total Poin</div>
+            <div id="jenisStats" class="jenis-stats"></div>
+
+            <div class="section-title">Total Poin</div>
+            <div class="chart-container">
+                <canvas id="overallProgressChart"></canvas>
+            </div>
+            <div id="overallNoData" class="no-data">Belum ada data mutabaah untuk filter yang dipilih.</div>
+
+            <div class="section-title">Detail Aktivitas</div>
+            <div id="detailCharts"></div>
+            <div id="detailNoData" class="no-data">Belum ada data dengan detail aktivitas untuk filter yang dipilih.</div>
+        </div>
+    </main>
+    <script>
+        Chart.register(ChartDataLabels);
+
+        const menuBtn = document.getElementById('menuBtn');
+        const dropdown = document.getElementById('dropdown');
+        menuBtn.addEventListener('click', () => {
+            menuBtn.classList.toggle('active');
+            dropdown.classList.toggle('active');
+        });
+        document.addEventListener('click', (e) => {
+            if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                menuBtn.classList.remove('active');
+                dropdown.classList.remove('active');
+            }
+        });
+
+        const jenisList = ['Pengurus Harian Tetap', 'Pengurus Harian Lengkap'];
+        const activityKeys = ['salatBerjamaah', 'salatRawatib', 'salatDhuha', 'salatTahajjud', 'tilawah', 'murajaah', 'infak', 'silaturahmi', 'puasaSunnah', 'membacaBuku', 'olahraga'];
+        const activityLabels = [
+            'Jamaah &/ tepat waktu',
+            'Rawatib',
+            'Dhuha',
+            'Tahajjud',
+            'Tilawah',
+            'Murajaah',
+            'Infak',
+            'Silaturahmi',
+            'Puasa Sunah',
+            'Membaca Buku',
+            'Olahraga'
+        ];
+
+        let currentFilters = {
+            bulan: '',
+            tahun: '',
+            gender: '',
+            kelas: ''
+        };
+
+        function getFilteredData() {
+            const data = JSON.parse(localStorage.getItem('mutabaahData') || '[]');
+            
+            if (!currentFilters.bulan && !currentFilters.tahun && !currentFilters.gender && !currentFilters.kelas) {
+                return data;
+            }
+            
+            return data.filter(entry => {
+                if (currentFilters.bulan && entry.bulan !== currentFilters.bulan) return false;
+                if (currentFilters.tahun && entry.tahun !== currentFilters.tahun) return false;
+                if (currentFilters.gender && entry.gender !== currentFilters.gender) return false;
+                if (currentFilters.kelas && entry.kelas !== currentFilters.kelas) return false;
+                return true;
+            });
+        }
+
+        function applyFilters() {
+            currentFilters = {
+                bulan: document.getElementById('filterBulan').value,
+                tahun: document.getElementById('filterTahun').value,
+                gender: document.getElementById('filterGender').value,
+                kelas: document.getElementById('filterKelas').value
+            };
+            
+            updateFilterInfo();
+            renderCharts();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterBulan').value = '';
+            document.getElementById('filterTahun').value = '';
+            document.getElementById('filterGender').value = '';
+            document.getElementById('filterKelas').value = '';
+            
+            currentFilters = {
+                bulan: '',
+                tahun: '',
+                gender: '',
+                kelas: ''
+            };
+            
+            updateFilterInfo();
+            renderCharts();
+        }
+
+        function updateFilterInfo() {
+            const infoDiv = document.getElementById('filterInfo');
+            const filters = [];
+            
+            const monthNames = {
+                '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+                '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+                '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember'
+            };
+            
+            if (currentFilters.gender) filters.push(`Gender: ${currentFilters.gender}`);
+            if (currentFilters.kelas) filters.push(`Kelas: ${currentFilters.kelas}`);
+            if (currentFilters.bulan) filters.push(`Bulan: ${monthNames[currentFilters.bulan]}`);
+            if (currentFilters.tahun) filters.push(`Tahun: ${currentFilters.tahun}`);
+            
+            if (filters.length > 0) {
+                infoDiv.textContent = `Filter Aktif: ${filters.join(' | ')}`;
+                infoDiv.style.display = 'block';
+            } else {
+                infoDiv.textContent = 'Menampilkan semua data';
+                infoDiv.style.display = 'block';
+            }
+        }
+
+        let overallChart = null;
+        let detailCharts = [];
+
+        function renderCharts() {
+            const filteredData = getFilteredData();
+            
+            if (overallChart) overallChart.destroy();
+            detailCharts.forEach(chart => chart.destroy());
+            detailCharts = [];
+            document.getElementById('detailCharts').innerHTML = '';
+            document.getElementById('jenisStats').innerHTML = '';
+            
+            const jenisStatsOverall = {};
+            jenisList.forEach(j => jenisStatsOverall[j] = {totalPoints: 0, totalEntries: 0, members: new Set()});
+            
+            let hasOverallData = false;
+            filteredData.forEach(entry => {
+                if (entry.jenis && jenisList.includes(entry.jenis)) {
+                    jenisStatsOverall[entry.jenis].totalPoints += entry.points || 0;
+                    jenisStatsOverall[entry.jenis].totalEntries += 1;
+                    jenisStatsOverall[entry.jenis].members.add(entry.nama);
+                    hasOverallData = true;
+                }
+            });
+            
+            const jenisStatsContainer = document.getElementById('jenisStats');
+            
+            jenisList.forEach(j => {
+                const stats = jenisStatsOverall[j];
+                if (stats.totalEntries === 0) return;
+                
+                const memberCount = stats.members.size;
+                const avgPerEntry = Math.round(stats.totalPoints / stats.totalEntries);
+                const avgPerMember = Math.round(stats.totalPoints / memberCount);
+                
+                const statCard = document.createElement('div');
+                statCard.className = 'stat-card';
+                statCard.innerHTML = `
+                    <h3>${j}</h3>
+                    <div class="stat-number">${stats.totalPoints}</div>
+                    <div class="stat-detail">
+                        Total Poin<br>
+                        ${stats.totalEntries} entri dari ${memberCount} anggota<br>
+                        Rata-rata: ${avgPerEntry} poin/entri<br>
+                        Rata-rata: ${avgPerMember} poin/anggota
+                    </div>
+                `;
+                jenisStatsContainer.appendChild(statCard);
+            });
+            
+            if (!hasOverallData) {
+                jenisStatsContainer.innerHTML = '<div class="no-data" style="grid-column: 1/-1">Belum ada data mutabaah untuk filter yang dipilih.</div>';
+            }
+            
+            const overallTotals = jenisList.map(j => jenisStatsOverall[j].totalPoints);
+            const overallEntries = jenisList.map(j => jenisStatsOverall[j].totalEntries);
+            
+            document.getElementById('overallNoData').style.display = hasOverallData ? 'none' : 'block';
+            
+            if (hasOverallData) {
+                const maxOverallTotal = Math.max(...overallTotals, 0);
+                const suggestedOverallMax = maxOverallTotal > 0 ? maxOverallTotal + Math.max(20, maxOverallTotal * 0.2) : 200;
+                
+                const ctxOverall = document.getElementById('overallProgressChart').getContext('2d');
+                overallChart = new Chart(ctxOverall, {
+                    type: 'bar',
+                    data: { 
+                        labels: jenisList, 
+                        datasets: [{ 
+                            label: 'Total Poin', 
+                            data: overallTotals, 
+                            backgroundColor: 'rgba(154, 222, 36, 0.8)', 
+                            borderColor: '#9ade24', 
+                            borderWidth: 1, 
+                            borderRadius: 6, 
+                            borderSkipped: false, 
+                            maxBarThickness: 60 
+                        }] 
+                    },
+                    options: {
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { 
+                                callbacks: { 
+                                    label: ctx => 'Total Poin: ' + ctx.parsed.y, 
+                                    afterLabel: ctx => 'Entri: ' + overallEntries[ctx.dataIndex] + ' data' 
+                                } 
+                            },
+                            datalabels: { 
+                                anchor: 'end', 
+                                align: 'top', 
+                                font: { weight: 'bold', size: 14 }, 
+                                color: '#333', 
+                                formatter: v => v > 0 ? v + ' poin' : '' 
+                            }
+                        },
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                suggestedMax: suggestedOverallMax, 
+                                ticks: { stepSize: Math.ceil(suggestedOverallMax / 10) }, 
+                                title: { 
+                                    display: true, 
+                                    text: 'Total Poin',
+                                    font: { weight: 'bold', size: 14 }
+                                } 
+                            }, 
+                            x: { 
+                                grid: { display: false }, 
+                                title: { 
+                                    display: true, 
+                                    text: 'Jenis Pengurus',
+                                    font: { weight: 'bold', size: 14 }
+                                } 
+                            } 
+                        }
+                    }
+                });
+            }
+            
+            const jenisStatsDetail = {};
+            jenisList.forEach(j => jenisStatsDetail[j] = { 
+                totalEntries: 0, 
+                activityTotals: activityKeys.reduce((o, k) => ({...o, [k]: 0}), {}),
+                gender: { Ikhwan: 0, Akhwat: 0 },
+                kelas: { X: 0, XI: 0 }
+            });
+            
+            let hasDetailData = false;
+            filteredData.forEach(entry => {
+                if (entry.jenis && entry.activityPoints && jenisList.includes(entry.jenis)) {
+                    const s = jenisStatsDetail[entry.jenis];
+                    s.totalEntries += 1;
+                    if (entry.gender) s.gender[entry.gender]++;
+                    if (entry.kelas) s.kelas[entry.kelas]++;
+                    activityKeys.forEach(k => s.activityTotals[k] += entry.activityPoints[k] || 0);
+                    hasDetailData = true;
+                }
+            });
+            
+            document.getElementById('detailNoData').style.display = hasDetailData ? 'none' : 'block';
+            
+            if (hasDetailData) {
+                const detailChartsContainer = document.getElementById('detailCharts');
+                
+                jenisList.forEach((j, index) => {
+                    const stats = jenisStatsDetail[j];
+                    if (stats.totalEntries === 0) return;
+                    
+                    const totals = activityKeys.map(k => stats.activityTotals[k]);
+                    const maxTotal = Math.max(...totals, 0);
+                    const suggestedMax = maxTotal > 0 ? maxTotal + Math.max(10, maxTotal * 0.2) : 50;
+                    
+                    const ikhwanPercent = Math.round((stats.gender.Ikhwan / stats.totalEntries) * 100);
+                    const akhwatPercent = Math.round((stats.gender.Akhwat / stats.totalEntries) * 100);
+                    const xPercent = Math.round((stats.kelas.X / stats.totalEntries) * 100);
+                    const xiPercent = Math.round((stats.kelas.XI / stats.totalEntries) * 100);
+                    
+                    const section = document.createElement('div');
+                    section.innerHTML = `
+                        <h3 style="text-align: center; color: var(--text); margin-bottom: 0.5rem;">${j}</h3>
+                        <p style="text-align: center; margin-bottom: 0.5rem; color: var(--text-light);">
+                            ${stats.totalEntries} entri • Gender: ${ikhwanPercent}% Ikhwan, ${akhwatPercent}% Akhwat • Kelas: ${xPercent}% X, ${xiPercent}% XI
+                        </p>
+                        <div class="chart-container detail">
+                            <canvas id="detailChart${index}"></canvas>
+                        </div>
+                    `;
+                    detailChartsContainer.appendChild(section);
+                    
+                    const ctx = document.getElementById(`detailChart${index}`).getContext('2d');
+                    const chart = new Chart(ctx, {
+                        type: 'bar',
+                        data: { 
+                            labels: activityLabels, 
+                            datasets: [{ 
+                                label: 'Total Poin', 
+                                data: totals, 
+                                backgroundColor: 'rgba(154, 222, 36, 0.8)', 
+                                borderColor: '#9ade24', 
+                                borderWidth: 1, 
+                                borderRadius: 6, 
+                                borderSkipped: false,
+                                maxBarThickness: 60
+                            }] 
+                        },
+                        options: {
+                            responsive: true, 
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: ctx => 'Total Poin: ' + ctx.parsed.y
+                                    }
+                                },
+                                datalabels: { 
+                                    anchor: 'end', 
+                                    align: 'top', 
+                                    font: { weight: 'bold', size: 14 }, 
+                                    color: '#333', 
+                                    formatter: v => v > 0 ? v + ' poin' : '' 
+                                }
+                            },
+                            scales: {
+                                y: { 
+                                    beginAtZero: true, 
+                                    suggestedMax: suggestedMax, 
+                                    ticks: { stepSize: Math.ceil(suggestedMax / 10) }, 
+                                    title: { 
+                                        display: true, 
+                                        text: 'Total Poin',
+                                        font: { weight: 'bold', size: 14 }
+                                    } 
+                                },
+                                x: { 
+                                    grid: { display: false }, 
+                                    title: { 
+                                        display: true, 
+                                        text: 'Aktivitas Ibadah',
+                                        font: { weight: 'bold', size: 14 }
+                                    }, 
+                                    ticks: { 
+                                        maxRotation: 0,
+                                        minRotation: 0,
+                                        autoSkip: false,
+                                        font: { size: 12 }
+                                    } 
+                                }
+                            }
+                        }
+                    });
+                    
+                    detailCharts.push(chart);
+                });
+            }
+        }
+
+        updateFilterInfo();
+        renderCharts();
+        
+        // Toggle submenu
+const progressToggle = document.getElementById('progressToggle');
+const progressSubmenu = document.getElementById('progressSubmenu');
+const peringkatToggle = document.getElementById('peringkatToggle');
+const peringkatSubmenu = document.getElementById('peringkatSubmenu');
+
+progressToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    progressSubmenu.classList.toggle('active');
+    progressToggle.classList.toggle('active');
+    
+    // Tutup submenu lain agar tidak bertumpuk
+    peringkatSubmenu.classList.remove('active');
+    peringkatToggle.classList.remove('active');
+});
+
+peringkatToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    peringkatSubmenu.classList.toggle('active');
+    peringkatToggle.classList.toggle('active');
+    
+    // Tutup submenu lain
+    progressSubmenu.classList.remove('active');
+    progressToggle.classList.remove('active');
+});
+
+// Modifikasi event click luar agar menutup submenu juga
+document.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !dropdown.contains(e.target)) {
+        menuBtn.classList.remove('active');
+        dropdown.classList.remove('active');
+        
+        // Tutup semua submenu saat menu utama ditutup
+        progressSubmenu.classList.remove('active');
+        peringkatSubmenu.classList.remove('active');
+        progressToggle.classList.remove('active');
+        peringkatToggle.classList.remove('active');
+    }
+});
+    </script>
+</body>
+</html>
